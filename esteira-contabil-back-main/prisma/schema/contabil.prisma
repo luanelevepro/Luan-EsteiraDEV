@@ -1,0 +1,87 @@
+model con_empresas {
+  id                   String              @id @default(uuid())
+  dt_created           DateTime            @default(now())
+  dt_updated           DateTime            @default(now()) @updatedAt
+  id_sis_empresas      String              @unique
+  sis_empresas         sis_empresas        @relation(fields: [id_sis_empresas], references: [id])
+  js_con_plano_contas  con_plano_contas[]
+  js_con_grupo_contas  con_grupo_contas[]
+  js_con_departamentos con_departamentos[]
+  js_con_centro_custos con_centro_custos[]
+}
+
+model con_tipo_grupo {
+  id                  String             @id @default(uuid())
+  dt_created          DateTime           @default(now())
+  dt_updated          DateTime           @default(now()) @updatedAt
+  ds_nome_tipo        String?
+  is_ativo            Boolean?
+  js_con_grupo_contas con_grupo_contas[]
+}
+
+model con_grupo_contas {
+  id                     String             @id @default(uuid())
+  dt_created             DateTime           @default(now())
+  dt_updated             DateTime           @default(now()) @updatedAt
+  ds_classificacao_grupo String?
+  ds_nome_grupo          String?
+  ds_tipo                String?
+  is_ativo               Boolean?
+  id_tipo_grupo          String?
+  con_tipo_grupo         con_tipo_grupo?    @relation(fields: [id_tipo_grupo], references: [id])
+  id_con_empresas        String?
+  js_con_empresas        con_empresas?      @relation(fields: [id_con_empresas], references: [id])
+  js_con_plano_contas    con_plano_contas[]
+}
+
+model con_plano_contas {
+  id                   String                @id @default(uuid())
+  dt_created           DateTime              @default(now())
+  dt_updated           DateTime              @default(now()) @updatedAt
+  id_con_empresas      String?
+  js_con_empresas      con_empresas?         @relation(fields: [id_con_empresas], references: [id])
+  ds_classificacao_cta String?
+  ds_nome_cta          String?
+  ds_tipo_cta          String?
+  ds_nivel_cta         Int?
+  ds_classificacao_pai String?
+  id_externo           String?
+  id_conta_pai         String?
+  is_ativo             Boolean?
+  id_empresa_externo   String?
+  ds_tipo_tms_despesa  TipoDespesa?
+  js_con_plano_contas  con_plano_contas[]    @relation("plano_contas_pai")
+  js_conta_pai         con_plano_contas?     @relation("plano_contas_pai", fields: [id_conta_pai], references: [id])
+  id_grupo_contas      String?
+  js_con_grupo_contas  con_grupo_contas?     @relation(fields: [id_grupo_contas], references: [id])
+  tms_viagem_despesas  tms_viagem_despesas[]
+}
+
+model con_departamentos {
+  id                   String              @id @default(uuid())
+  dt_created           DateTime            @default(now())
+  dt_updated           DateTime            @default(now()) @updatedAt
+  ds_nome_depart       String?
+  id_depart_externo    String?
+  is_ativo             Boolean?
+  ds_origem_registro   String? // Descrição	Origem do registro 0 - Sistema, 1 - Imp. Tabelas, 2 - Imp. Layout, 3- Imp. Tabelas Concorrentes
+  id_con_empresas      String?
+  js_con_empresas      con_empresas?       @relation(fields: [id_con_empresas], references: [id])
+  js_con_centro_custos con_centro_custos[]
+}
+
+model con_centro_custos {
+  id                   String             @id @default(uuid())
+  dt_created           DateTime           @default(now())
+  dt_updated           DateTime           @default(now()) @updatedAt
+  dt_cadastro          DateTime?
+  ds_nome_ccusto       String?
+  id_externo_ccusto    String?
+  is_ativo             Boolean?
+  ds_origem_registro   String? // Descrição	Origem do registro 0 - Sistema, 1 - Imp. Tabelas, 2 - Imp. Layout, 3- Imp. Tabelas Concorrentes
+  id_con_departamentos String?
+  js_con_departamentos con_departamentos? @relation(fields: [id_con_departamentos], references: [id])
+  id_con_empresas      String?
+  js_con_empresas      con_empresas?      @relation(fields: [id_con_empresas], references: [id])
+  js_tms_veiculos      tms_veiculos[]
+}

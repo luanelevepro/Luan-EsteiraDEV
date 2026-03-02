@@ -1,0 +1,40 @@
+import { Router } from 'express';
+import veiculosRoutes from './veiculos.routes';
+import fipeRoutes from './fipe.routes';
+import segmentosRoutes from './segmentos.routes';
+import clientesRoutes from './clientes.routes';
+import fisClientesRoutes from './fis-clientes.routes';
+import cargasRoutes from './cargas.routes';
+import armadoresRoutes from './armadores.routes';
+import viagensRoutes from './viagens.routes';
+import motoristasRoutes from './motorista.routes';
+import motoristasVeiculosRoutes from './motoristas-veiculos.routes';
+import entregasRoutes from './entregas.routes';
+import documentosRelacionadosRoutes from './documentos-relacionados.routes';
+import despesasRoutes from './despesas.routes';
+import fechamentoMotoristasRoutes from './fechamento-motoristas.routes';
+import embarcadoresRoutes from './embarcadores.routes';
+import cronogramaRoutes from './cronograma.routes';
+import colunasPersonalizadasRoutes from './colunas-personalizadas.routes';
+
+const router = Router();
+
+router.use('/colunas-personalizadas', colunasPersonalizadasRoutes);
+router.use('/cronograma', cronogramaRoutes);
+router.use('/fechamento-motoristas', fechamentoMotoristasRoutes);
+router.use('/veiculos', veiculosRoutes);
+router.use('/fipe', fipeRoutes);
+router.use('/segmentos', segmentosRoutes);
+router.use('/clientes', clientesRoutes);
+router.use('/fis-clientes', fisClientesRoutes);
+router.use('/embarcadores', embarcadoresRoutes);
+router.use('/cargas', cargasRoutes);
+router.use('/armadores', armadoresRoutes);
+router.use('/entregas', entregasRoutes);
+router.use('/viagens', viagensRoutes);
+router.use('/motoristas', motoristasRoutes);
+router.use('/motoristas-veiculos', motoristasVeiculosRoutes);
+router.use('/documentos', documentosRelacionadosRoutes);
+router.use('/', despesasRoutes);
+
+export default router;

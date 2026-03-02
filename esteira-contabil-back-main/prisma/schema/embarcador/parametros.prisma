@@ -1,0 +1,38 @@
+model emb_classificacao_veiculos {
+  id                              String              @id @default(uuid())
+  ds_classificacao                String              @db.VarChar(35)
+  fl_carroceria_um_independente   Boolean?
+  fl_carroceria_dois_independente Boolean?
+  id_emb_empresas                 String
+  emb_empresas                    emb_empresas        @relation(fields: [id_emb_empresas], references: [id])
+  dt_created                      DateTime            @default(now())
+  dt_updated                      DateTime            @updatedAt
+  emb_tipos_veiculo               emb_tipos_veiculo[]
+
+  @@unique([ds_classificacao, id_emb_empresas])
+}
+
+model emb_classificacao_carrocerias {
+  id                   String                 @id @default(uuid())
+  ds_classificacao     String                 @db.VarChar(35)
+  id_emb_empresas      String
+  emb_empresas         emb_empresas           @relation(fields: [id_emb_empresas], references: [id])
+  dt_created           DateTime               @default(now())
+  dt_updated           DateTime               @updatedAt
+  emb_tipos_carroceria emb_tipos_carroceria[]
+
+  @@unique([ds_classificacao, id_emb_empresas])
+}
+
+model emb_classificacao_implementos {
+  id                String            @id @default(uuid())
+  ds_classificacao  String            @db.VarChar(35)
+  fl_acrescimo_eixo Boolean?
+  id_emb_empresas   String
+  emb_empresas      emb_empresas      @relation(fields: [id_emb_empresas], references: [id])
+  dt_created        DateTime          @default(now())
+  dt_updated        DateTime          @updatedAt
+  emb_implementos   emb_implementos[]
+
+  @@unique([id_emb_empresas, ds_classificacao])
+}

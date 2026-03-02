@@ -1,0 +1,32 @@
+model adm_empresas {
+  id                     String                   @id @default(uuid())
+  dt_created             DateTime                 @default(now())
+  dt_updated             DateTime                 @updatedAt
+  id_sis_empresas        String                   @unique
+  js_empresas            sis_empresas             @relation(fields: [id_sis_empresas], references: [id], onDelete: Cascade)
+  adm_consumo_integracao adm_consumo_integracao[] @relation(name: "id_empresa_usou_integracao")
+}
+
+model adm_consumo_integracao {
+  id              String                @id @default(uuid())
+  dt_created      DateTime              @default(now())
+  dt_updated      DateTime              @updatedAt
+  dt_competencia  DateTime
+  ds_tipo_consumo TipoConsumoIntegracao
+  ds_consumo      Int
+  id_integracao   String
+  js_integracao   sis_integracao        @relation(fields: [id_integracao], references: [id], onDelete: Cascade)
+  id_adm_empresas String
+  js_empresas     adm_empresas          @relation(name: "id_empresa_usou_integracao", fields: [id_adm_empresas], references: [id])
+
+  @@unique([id_adm_empresas, id_integracao, dt_competencia, ds_tipo_consumo], name: "empresa_integracao_por_tipo_competencia")
+}
+
+enum TipoConsumoIntegracao {
+  NFSE_TOMADOS_TECNOSPEED
+  API_DOMINIO
+  NFSE_SIEG
+  NFE_SIEG
+  NFCE_SIEG
+  CTE_SIEG
+}

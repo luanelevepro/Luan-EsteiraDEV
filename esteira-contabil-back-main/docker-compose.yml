@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  backend:
+    build: .
+    container_name: esteira-backend
+    ports:
+      - '4000:4000'
+    env_file:
+      - .env
+    command: pnpm start

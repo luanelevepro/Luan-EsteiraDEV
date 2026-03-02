@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "TipoEf" ADD VALUE 'TOMADO';

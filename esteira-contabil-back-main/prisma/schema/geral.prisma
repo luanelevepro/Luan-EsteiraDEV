@@ -1,0 +1,18 @@
+model ger_pessoa {
+  id                String           @id @default(uuid())
+  ds_tipo_pessoa    String           @default("F")
+  ds_nome           String
+  ds_documento      String           @unique
+  ds_email          String?
+  ds_telefone       String?
+  ds_logradouro     String?
+  ds_numero         String?
+  ds_complemento    String?
+  ds_bairro         String?
+  ds_cep            String?
+  id_sis_municipios String?
+  is_ativo          Boolean          @default(true)
+  dt_created_at     DateTime         @default(now())
+  dt_updated_at     DateTime         @updatedAt
+  tms_motoristas    tms_motoristas[]
+}

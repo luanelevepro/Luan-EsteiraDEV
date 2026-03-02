@@ -1,0 +1,44 @@
+generator client {
+  provider        = "prisma-client-js"
+  // Vscode vai tentar mentir sobre isso aqui pra você.
+  // Não remova, o prisma já suporta a feature por padrão
+  // mas... durante as etapas do `generate` a ausência dela vai causar erro.
+  // A solução é atualizar o prisma e colocar os campos de geração já que agora os tipos
+  // na pasta node_modules estão deprecated
+  previewFeatures = ["prismaSchemaFolder"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE")
+  directUrl = env("DATABASE_DIRECT")
+}
+
+// Colunas:
+// id_ : Chaves Estrangeiras
+// cd_ : Códigos
+// ds_ : Descrições
+// dt_ : Datas
+// fl_ : Flags/Booleanos
+// js_ : Listas JsonB
+// vl_ : Valores Explícitos (Definidos explicitamente, não sendo output de cálculos)
+// vc_ : Valores Calculados (Definidos implicitamente)
+
+// Tabelas:
+// fis_ : Fiscal
+// con_ : Contábil
+// fin_ : Financeiro/Finanças
+// est_ : Estoque
+// sis_ : Sistema
+// rh_  : Recursos Humano
+// emb_ : Embarcador
+
+enum CadastroTipo {
+  REGIME_TRIBUTARIO
+  SEGMENTO_EMPRESA
+  PRODUTO_SEGMENTO
+  TIPO_PRODUTO
+  ORIGEM_CST
+  CST
+  CFOP
+}

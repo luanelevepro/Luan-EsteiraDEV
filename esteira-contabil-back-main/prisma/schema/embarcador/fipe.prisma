@@ -1,0 +1,40 @@
+model sis_tabela_fipe {
+  id                   String                @id @default(uuid())
+  ds_marca             String                @db.Text
+  ds_modelo            String                @db.Text
+  cd_fipe              String                @db.VarChar(50)
+  vl_ano_modelo        String                @db.VarChar(4)
+  vl_valor             String                @db.Text
+  dt_created           DateTime?             @default(now())
+  dt_updated           DateTime?             @updatedAt
+  // Tipo do Veículo a ser enviado para a API, sendo: cars = 1, motorcycles = 2, trucks = 3
+  cd_tipo_veiculo      String?
+  emb_frota_reposicao  emb_frota_reposicao[]
+  // emb_frota emb_frota[]
+  id_emb_tipos_veiculo String?
+  js_emb_tipos_veiculo emb_tipos_veiculo?    @relation(fields: [id_emb_tipos_veiculo], references: [id])
+
+  emb_frota              emb_frota[]
+  sis_fipe_historico     sis_fipe_historico[]
+  emb_frota_carroceria_2 emb_frota[]          @relation(name: "Carroceria2FIPE")
+  emb_frota_carroceria   emb_frota[]          @relation(name: "CarroceriaFIPE")
+  tmsVeiculos            tms_veiculos[]
+
+  @@unique([cd_fipe, vl_ano_modelo])
+}
+
+model sis_fipe_historico {
+  id                   String             @id @default(uuid())
+  id_emb_fipe          String
+  js_sis_fipe          sis_tabela_fipe    @relation(fields: [id_emb_fipe], references: [id])
+  ds_marca             String             @db.Text
+  ds_modelo            String             @db.Text
+  cd_fipe              String             @db.VarChar(50)
+  id_emb_tipos_veiculo String?
+  js_emb_tipos_veiculo emb_tipos_veiculo? @relation(fields: [id_emb_tipos_veiculo], references: [id])
+  cd_tipo_veiculo      Int?               @default(0)
+  vl_mes               String             @db.VarChar(50)
+  vl_ano               String             @db.VarChar(50)
+  vl_ano_modelo        String             @db.VarChar(50)
+  vl_valor             Decimal?           @db.Decimal(14, 2)
+}

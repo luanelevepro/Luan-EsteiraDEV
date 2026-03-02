@@ -1,0 +1,658 @@
+// === EMPRESAS TMS ===
+model tms_empresas {
+  id               String             @id @default(uuid())
+  dt_created       DateTime           @default(now())
+  dt_updated       DateTime           @default(now()) @updatedAt
+  id_sis_empresas  String             @unique
+  sis_empresas     sis_empresas       @relation(fields: [id_sis_empresas], references: [id])
+  js_tms_veiculos  tms_veiculos[]
+  js_tms_segmentos tms_segmentos[]
+  tms_embarcadores tms_embarcadores[]
+  tms_cargas       tms_cargas[]
+  tmsViagens       tms_viagens[]
+  tms_fechamentos  tms_fechamentos[]
+}
+
+// === CADASTROS ===
+model tms_segmentos {
+  id                    String                 @id @default(uuid())
+  dt_created            DateTime               @default(now())
+  dt_updated            DateTime               @default(now()) @updatedAt
+  cd_identificador      String
+  ds_nome               String
+  is_ativo              Boolean                @default(true)
+  id_tms_empresas       String
+  tms_empresas          tms_empresas           @relation(fields: [id_tms_empresas], references: [id])
+  tms_cargas            tms_cargas[]
+  tms_veiculo_segmentos tms_veiculo_segmento[]
+}
+
+/// Cadastro TMS de embarcadores (expedidor)
+model tms_embarcadores {
+  id                 String         @id @default(uuid())
+  dt_created         DateTime       @default(now())
+  dt_updated         DateTime       @default(now()) @updatedAt
+  id_tms_empresa     String
+  tms_empresas       tms_empresas   @relation(fields: [id_tms_empresa], references: [id])
+  ds_nome            String
+  ds_documento       String?
+  ds_ie              String?
+  id_cidade          Int?
+  sis_igbe_city      sis_igbe_city? @relation("TmsEmbarcadoresCidade", fields: [id_cidade], references: [id])
+  ds_logradouro      String?
+  ds_numero          String?
+  ds_complemento     String?
+  ds_bairro          String?
+  ds_cep             String?
+  ds_uf              String?
+  ds_telefone        String?
+  ds_email           String?
+  cd_municipio_ibge  String?
+  ds_origem_cadastro String?
+
+  tms_cargas tms_cargas[]
+
+  @@unique([id_tms_empresa, ds_documento])
+  @@index([id_tms_empresa])
+}
+
+// === MOTORISTAS E VEÍCULOS ===
+
+model tms_motoristas {
+  id                    String           @id @default(uuid())
+  id_ger_pessoa         String?
+  id_rh_funcionarios    String?
+  rh_funcionarios       rh_funcionarios? @relation(fields: [id_rh_funcionarios], references: [id])
+  ds_cnh_numero         String?
+  ds_cnh_categoria      String?
+  dt_vencimento_cnh     DateTime?
+  dt_primeira_cnh       DateTime?
+  id_sis_municipios_cnh Int?
+  sis_ibge_city         sis_igbe_city?   @relation(fields: [id_sis_municipios_cnh], references: [id])
+  is_ativo              Boolean
+  dt_created            DateTime         @default(now())
+  dt_updated            DateTime         @updatedAt
+
+  ger_pessoa              ger_pessoa?               @relation(fields: [id_ger_pessoa], references: [id]) // <- O @relation fica AQUI
+  tms_motoristas_veiculos tms_motoristas_veiculos[]
+  fisCtes                 fis_cte[]
+  tms_fechamentos         tms_fechamentos[]
+}
+
+model tms_veiculos {
+  id                           String                    @id @default(uuid())
+  dt_created                   DateTime                  @default(now())
+  dt_updated                   DateTime                  @default(now()) @updatedAt
+  ds_placa                     String
+  ds_nome                      String
+  id_externo                   String?
+  cd_identificador             String?
+  dt_aquisicao                 DateTime?
+  dt_baixa                     DateTime?
+  dt_cadastro                  DateTime?
+  vl_aquisicao                 String?
+  is_ativo                     Boolean?                  @default(true)
+  // id_marca                String?
+  // js_marca                sis_marcas_fipe?          @relation(fields: [id_marca], references: [id])
+  id_modelo                    String?
+  js_modelo                    sis_tabela_fipe?          @relation(fields: [id_modelo], references: [id])
+  ds_marca                     String?
+  ds_modelo                    String?
+  vl_ano_fabricacao            String?
+  vl_ano_modelo                String?
+  vl_eixos                     String?
+  ds_ano_fabricacao            String?
+  ds_tipo_unidade              TipoUnidade?
+  ds_tipo_carroceria_carga     TipoCarroceria?
+  ds_classificacao_tracionador ClassificacaoTracionador?
+  ds_classificacao_carroceria  ClassificacaoCarroceria?
+  ds_classificacao_rigido      ClassificacaoRigido?
+  id_tms_empresas              String
+  tms_empresas                 tms_empresas              @relation(fields: [id_tms_empresas], references: [id])
+  id_centro_custos             String?
+  js_con_centro_custos         con_centro_custos?        @relation(fields: [id_centro_custos], references: [id])
+  tms_motoristas_veiculos      tms_motoristas_veiculos[]
+  tms_veiculo_segmentos        tms_veiculo_segmento[]
+  tms_cargas                   tms_cargas[]              @relation("CargaCarroceriaPlanejada")
+
+  @@index([id_tms_empresas])
+  @@index([is_ativo])
+}
+
+enum TipoUnidade {
+  TRACIONADOR
+  CARROCERIA
+  RIGIDO
+}
+
+enum ClassificacaoTracionador {
+  CAVALO_4X2
+  CAVALO_6X2
+  CAVALO_6X4
+  CAVALO_8X2
+  CAVALO_8X4
+}
+
+enum ClassificacaoCarroceria {
+  CARRETA_LS
+  CARRETA_VANDERLEIA
+  CARRETA_4_EIXO
+  BITREM
+  RODOTREM
+  ROMEU_E_JULIETA
+  REBOQUE_SIMPLES
+}
+
+enum ClassificacaoRigido {
+  CARRO
+  MINI_VAN
+  VAN
+  VUC
+  CAMINHAO_TOCO
+  CAMINHAO_TRUCK
+}
+
+model tms_veiculo_segmento {
+  id              String        @id @default(uuid())
+  dt_created      DateTime      @default(now())
+  dt_updated      DateTime      @default(now()) @updatedAt
+  id_tms_veiculo  String
+  tms_veiculos    tms_veiculos  @relation(fields: [id_tms_veiculo], references: [id])
+  id_tms_segmento String
+  tms_segmentos   tms_segmentos @relation(fields: [id_tms_segmento], references: [id])
+}
+
+model tms_motoristas_veiculos {
+  id                String @id @default(uuid())
+  id_tms_motoristas String
+  id_tms_veiculos   String
+
+  dt_inicio      DateTime       @default(now())
+  dt_fim         DateTime?
+  is_principal   Boolean        @default(false)
+  is_ativo       Boolean        @default(true)
+  dt_created     DateTime       @default(now())
+  dt_updated     DateTime       @updatedAt
+  tms_motoristas tms_motoristas @relation(fields: [id_tms_motoristas], references: [id])
+  tms_veiculos   tms_veiculos   @relation(fields: [id_tms_veiculos], references: [id])
+  tms_cargas     tms_cargas[]
+  tmsViagens     tms_viagens[]
+}
+
+// === CARGAS e ENTREGAS ===
+
+// Tabelas antigas (serão removidas após migração de dados)
+model tms_cargas_nfe {
+  id         String     @id @default(uuid())
+  id_nfe     String
+  id_carga   String
+  ordem      Int
+  js_cargas  tms_cargas @relation(fields: [id_carga], references: [id])
+  js_nfe     fis_nfe    @relation(fields: [id_nfe], references: [id])
+  dt_created DateTime   @default(now())
+  dt_updated DateTime   @default(now()) @updatedAt
+
+  @@unique([id_carga, id_nfe])
+}
+
+model tms_cargas_cte {
+  id         String     @id @default(uuid())
+  id_cte     String
+  id_carga   String
+  ordem      Int
+  js_carga   tms_cargas @relation(fields: [id_carga], references: [id], onDelete: Cascade)
+  js_cte     fis_cte    @relation(fields: [id_cte], references: [id])
+  dt_created DateTime   @default(now())
+  dt_updated DateTime   @default(now()) @updatedAt
+
+  @@unique([id_carga, id_cte])
+}
+
+// Nova estrutura: Entregas dentro de uma Carga
+model tms_entregas {
+  id         String        @id @default(uuid())
+  cd_entrega String? // Código/número da entrega
+  ds_status  StatusEntrega @default(PENDENTE)
+  dt_created DateTime      @default(now())
+  dt_updated DateTime      @default(now()) @updatedAt
+
+  // Ponto de entrega
+  id_cidade_destino  Int
+  sis_cidade_destino sis_igbe_city @relation("DestinoEntrega", fields: [id_cidade_destino], references: [id])
+  ds_endereco        String?
+  ds_complemento     String?
+
+  // Recebedor/destinatário (preenchidos pelo parser quando disponíveis no XML)
+  ds_nome_recebedor         String?
+  ds_documento_recebedor    String?
+  ds_nome_destinatario      String?
+  ds_documento_destinatario String?
+
+  // Dados de entrega
+  dt_limite_entrega      DateTime?
+  dt_inicio_rota         DateTime? // Data/hora em que saiu para esta entrega (EM_TRANSITO)
+  dt_entrega             DateTime?
+  ds_comprovante_entrega String?
+  ds_comprovante_key     String?
+  ds_observacoes         String?
+  vl_peso_bruto          Float?
+  vl_cubagem             Float?
+  vl_qtd_volumes         Int?
+  vl_total_mercadoria    Float? // Valor total da mercadoria (permite agregar desde entrega até viagem)
+  js_produtos            String[]  @default([]) // Lista de produtos (ex.: proPred do CT-e; xProd dos itens da NF-e)
+
+  // Relacionamento com carga
+  id_carga   String
+  tms_cargas tms_cargas @relation(fields: [id_carga], references: [id], onDelete: Cascade)
+
+  // Documentos desta entrega
+  js_entregas_ctes tms_entregas_cte[]
+  js_entregas_nfes tms_entregas_nfe[]
+
+  nr_sequencia Int // Ordem de entrega dentro da carga (1º, 2º, 3º...)
+
+  @@unique([id_carga, nr_sequencia])
+  @@index([id_carga])
+  @@index([ds_status])
+}
+
+// Documentos (CTes) vinculados a cada entrega
+model tms_entregas_cte {
+  id          String       @id @default(uuid())
+  id_cte      String
+  id_entrega  String
+  ordem       Int // Ordem do CTE dentro da entrega
+  js_entregas tms_entregas @relation(fields: [id_entrega], references: [id], onDelete: Cascade)
+  js_cte      fis_cte      @relation(fields: [id_cte], references: [id])
+  dt_created  DateTime     @default(now())
+  dt_updated  DateTime     @default(now()) @updatedAt
+
+  @@unique([id_entrega, id_cte])
+  @@index([id_entrega])
+  @@index([id_cte])
+}
+
+// Documentos (NFes) vinculados a cada entrega
+model tms_entregas_nfe {
+  id          String       @id @default(uuid())
+  id_nfe      String
+  id_entrega  String
+  ordem       Int // Ordem da NFe dentro da entrega
+  js_entregas tms_entregas @relation(fields: [id_entrega], references: [id], onDelete: Cascade)
+  js_nfe      fis_nfe      @relation(fields: [id_nfe], references: [id])
+  dt_created  DateTime     @default(now())
+  dt_updated  DateTime     @default(now()) @updatedAt
+
+  @@unique([id_entrega, id_nfe])
+  @@index([id_entrega])
+  @@index([id_nfe])
+}
+
+model tms_cargas {
+  id               String      @id @default(uuid())
+  cd_carga         String?
+  ds_status        StatusCarga
+  dt_created       DateTime    @default(now())
+  dt_updated       DateTime    @default(now()) @updatedAt
+  dt_entregue_em   DateTime?
+  dt_coleta_inicio DateTime?
+  dt_coleta_fim    DateTime?
+  dt_coleta        DateTime?
+
+  // Ponto de origem (saída) — opcional na importação; usuário preenche antes de iniciar trajeto se vazio
+  id_cidade_origem  Int?
+  sis_cidade_origem sis_igbe_city? @relation("OrigemCarga", fields: [id_cidade_origem], references: [id])
+
+  // Ponto de destino (chegada)
+  id_cidade_destino  Int?
+  sis_cidade_destino sis_igbe_city? @relation("DestinoCarga", fields: [id_cidade_destino], references: [id])
+
+  // Dados gerais
+  ds_observacoes            String?
+  ds_tipo_carroceria        TipoCarroceria?
+  ds_prioridade             PrioridadeCarga @default(NORMAL)
+  vl_peso_bruto             Float?
+  vl_cubagem                Float?
+  vl_qtd_volumes            Int?
+  vl_limite_empilhamento    Int?
+  fl_requer_seguro          Boolean         @default(true)
+  ds_comprovante_entrega    String? // Comprovante geral da carga
+  ds_comprovante_key        String?
+  fl_carroceria_desacoplada Boolean? // Deslocamento vazio: carroceria desacoplada
+  fl_deslocamento_vazio     Boolean?        @default(false) // true = item é deslocamento vazio (cd_carga é apenas identificador)
+  ds_status_coleta          StatusColeta?   @default(PENDENTE) // PENDENTE | EM_COLETA | CONCLUIDO (etapa antes das entregas)
+  ds_produto_predominante   String? // Produto predominante (ex.: importação; também em js_produtos da primeira entrega quando há destino)
+
+  // Relacionamentos
+  id_tms_empresa           String
+  tms_empresas             tms_empresas             @relation(fields: [id_tms_empresa], references: [id])
+  id_motorista_veiculo     String?
+  tms_motoristas_veiculos  tms_motoristas_veiculos? @relation(fields: [id_motorista_veiculo], references: [id])
+  id_fis_cliente           String?
+  fis_clientes             fis_clientes?            @relation(fields: [id_fis_cliente], references: [id])
+  id_embarcador            String?
+  tms_embarcadores         tms_embarcadores?        @relation(fields: [id_embarcador], references: [id])
+  id_segmento              String?
+  tms_segmentos            tms_segmentos?           @relation(fields: [id_segmento], references: [id])
+  id_carroceria_planejada  String?
+  tms_carroceria_planejada tms_veiculos?            @relation("CargaCarroceriaPlanejada", fields: [id_carroceria_planejada], references: [id], onDelete: SetNull)
+
+  // Entregas (múltiplos pontos de entrega)
+  js_entregas tms_entregas[]
+
+  // Relações antigas (deprecated)
+  js_cargas_nfes     tms_cargas_nfe[]
+  js_cargas_ctes     tms_cargas_cte[]
+  tms_viagens_cargas tms_viagens_cargas[]
+
+  // Container (quando ds_tipo_carroceria = PORTA_CONTAINER)
+  tms_fechamento_cargas tms_fechamento_cargas[]
+  tms_cargas_container  tms_cargas_container?
+
+  @@index([ds_status])
+  @@index([dt_entregue_em])
+  @@index([id_motorista_veiculo])
+}
+
+model tms_cargas_container {
+  id                 String         @id @default(uuid())
+  id_carga           String         @unique
+  tms_cargas         tms_cargas     @relation(fields: [id_carga], references: [id], onDelete: Cascade)
+  id_armador         String?
+  sis_armadores      sis_armadores? @relation(fields: [id_armador], references: [id], onDelete: SetNull)
+  nr_container       String?
+  nr_lacre_container String?
+  ds_destino_pais    String?
+  ds_setor_container String?
+  dt_created_at      DateTime       @default(now())
+  dt_updated_at      DateTime       @updatedAt
+}
+
+// Layouts de mapeamento para importação (cargas ou viagens)
+model tms_import_layout {
+  id             String       @id @default(uuid())
+  id_sis_empresa String
+  sis_empresas   sis_empresas @relation(fields: [id_sis_empresa], references: [id], onDelete: Cascade)
+  cd_tipo        String       @default("CARGAS") // CARGAS | VIAGENS
+  ds_nome        String
+  ds_descricao   String?
+  js_mapeamento  Json
+  dt_created     DateTime     @default(now())
+  dt_updated     DateTime     @default(now()) @updatedAt
+
+  @@index([id_sis_empresa])
+  @@index([id_sis_empresa, cd_tipo])
+}
+
+// testando a ideia das viagens
+
+model tms_viagens {
+  id                  String       @id @default(uuid())
+  cd_viagem           String
+  ds_status           StatusViagem @default(PLANEJADA)
+  dt_created          DateTime     @default(now())
+  dt_updated          DateTime     @default(now()) @updatedAt
+  dt_agendada         DateTime? // Data de saída planejada
+  dt_previsao_retorno DateTime? // Data de retorno prevista
+  dt_conclusao        DateTime? // Quando finalizou a viagem
+
+  // Recursos - Motorista e Veículos
+  id_motorista_veiculo    String?
+  tms_motoristas_veiculos tms_motoristas_veiculos? @relation(fields: [id_motorista_veiculo], references: [id])
+  ds_motorista            String
+  ds_placa_cavalo         String // Placa do cavalo mecânico
+  ds_placa_carreta_1      String? // Carreta 1 (opcional)
+  ds_placa_carreta_2      String? // Carreta 2 (opcional)
+  ds_placa_carreta_3      String? // Carreta 3 (opcional - Rodotrem/Tritrem)
+
+  // Empresa
+  id_tms_empresa          String
+  tms_empresas            tms_empresas              @relation(fields: [id_tms_empresa], references: [id])
+  js_viagens_cargas       tms_viagens_cargas[] // Relação N:N com cargas
+  tmsViagemDespesas       tms_viagem_despesas[]
+  tms_fechamento_viagens  tms_fechamento_viagens[]
+  tms_fechamento_cargas   tms_fechamento_cargas[]
+  tms_fechamentos_titulos tms_fechamentos_titulos[]
+
+  @@index([id_tms_empresa])
+  @@index([ds_status])
+  @@index([dt_agendada])
+}
+
+// Tabela de relacionamento N:N entre Viagens e Cargas (item da esteira sequencial)
+model tms_viagens_cargas {
+  id               String           @id @default(uuid())
+  id_viagem        String
+  tms_viagens      tms_viagens      @relation(fields: [id_viagem], references: [id], onDelete: Cascade)
+  id_carga         String
+  tms_cargas       tms_cargas       @relation(fields: [id_carga], references: [id], onDelete: Cascade)
+  dt_vinculacao    DateTime         @default(now())
+  nr_sequencia     Int
+  ds_status        StatusItemViagem @default(BLOQUEADO) // BLOQUEADO | DISPONIVEL | EM_DESLOCAMENTO | CONCLUIDO
+  dt_iniciado_em   DateTime?
+  dt_finalizado_em DateTime?
+
+  @@unique([id_viagem, id_carga])
+  @@index([id_viagem])
+  @@index([id_carga])
+}
+
+enum PrioridadeCarga {
+  BAIXA
+  NORMAL
+  ALTA
+  URGENTE
+}
+
+enum TipoCarroceria {
+  GRANELEIRO
+  BAU
+  SIDER
+  FRIGORIFICO
+  TANQUE
+  PORTA_CONTAINER
+}
+
+enum StatusCarga {
+  PENDENTE
+  AGENDADA
+  EM_COLETA
+  EM_TRANSITO
+  ENTREGUE
+}
+
+enum StatusEntrega {
+  PENDENTE // Aguardando entrega
+  EM_TRANSITO // A caminho
+  ENTREGUE // Entregue
+  DEVOLVIDA // Devolvida (não foi possível entregar)
+  CANCELADA // Cancelada
+}
+
+enum StatusViagem {
+  PLANEJADA // Viagem criada, aguardando início
+  EM_COLETA // Motorista saiu para coletar cargas
+  EM_VIAGEM // Cargas coletadas, em rota de entrega
+  CONCLUIDA // Viagem finalizada com sucesso
+  ATRASADA // Viagem com atraso identificado
+  CANCELADA // Viagem cancelada
+}
+
+// Status do item na sequência da viagem (esteira sequencial)
+enum StatusItemViagem {
+  BLOQUEADO // Item anterior ainda não concluído
+  DISPONIVEL // Pode iniciar
+  EM_DESLOCAMENTO // Em execução
+  CONCLUIDO // Finalizado
+}
+
+// Status da etapa de coleta da carga (antes das entregas)
+enum StatusColeta {
+  PENDENTE
+  EM_COLETA
+  CONCLUIDO
+}
+
+model tms_viagem_despesas {
+  id                      String                    @id @default(uuid())
+  id_viagem               String
+  tms_viagens             tms_viagens               @relation(fields: [id_viagem], references: [id], onDelete: Cascade)
+  ds_tipo                 TipoDespesa
+  vl_despesa              String
+  id_nfe_item             String?
+  fis_nfe_item            fis_nfe_itens?            @relation(fields: [id_nfe_item], references: [id])
+  ds_odometro             String?
+  id_nfse                 String?
+  fis_nfse                fis_nfse?                 @relation(fields: [id_nfse], references: [id])
+  dt_despesa              DateTime
+  ds_observacao           String?
+  id_conta_despesa        String?
+  con_conta_despesa       con_plano_contas?         @relation(fields: [id_conta_despesa], references: [id])
+  dt_created              DateTime                  @default(now())
+  dt_updated              DateTime                  @default(now()) @updatedAt
+  tms_fechamentos_titulos tms_fechamentos_titulos[]
+
+  @@index([id_viagem])
+}
+
+enum TipoDespesa {
+  DESPESA
+  ADIANTAMENTO
+  ABASTECIMENTO
+  PEDAGIO
+}
+
+enum StatusFechamento {
+  ABERTO
+  PENDENTE
+  FECHADO
+  REABERTO
+}
+
+// { ds_tipo: ADIANTAMENTO, vl_despesa: "350.00", dt_despesa: "2024-07-01"}
+
+// .....
+
+// { ds_tipo: ABASTECIMENTO, vl_despesa: "300.00", dt_despesa: "2024-07-02"}
+// { ds_tipo: DESPESA, vl_despesa: "50.00", dt_despesa: "2024-07-03"}
+// { ds_tipo: DESPESA, vl_despesa: "100.00", dt_despesa: "2024-07-04"}
+
+// 350 das despesas foram adiantadas, 300 foram para abastecimento e 150 para despesas diversas. O total da viagem é de 800.00, considerando os adiantamentos, abastecimentos e despesas.
+
+// MDF-e (Manifesto Eletrônico de Documentos Fiscais) -- por enquanto sem uso (TODO MDFE)
+// model tms_viagens_mdfe {
+//   id                      String                   @id @default(uuid())
+//   id_viagem               String
+//   tms_viagens             tms_viagens              @relation(fields: [id_viagem], references: [id], onDelete: Cascade)
+
+//   ds_numero               String
+//   cd_chave_acesso         String                   @unique
+//   ds_status               StatusMDFe               @default(PENDENTE)
+
+//   dt_emissao              DateTime
+//   dt_autorizacao          DateTime?
+//   dt_cancelamento         DateTime?
+//   ds_motivo_cancelamento  String?
+
+//   dt_created              DateTime                 @default(now())
+//   dt_updated              DateTime                 @default(now()) @updatedAt
+
+//   @@index([id_viagem])
+//   @@map("tms_viagens_mdfe")
+// }
+
+// === FECHAMENTO DE MOTORISTAS ===
+
+model tms_fechamentos {
+  id                       String           @id @default(uuid())
+  dt_created               DateTime         @default(now())
+  dt_updated               DateTime         @default(now()) @updatedAt
+  id_tms_empresa           String
+  id_tms_motoristas        String
+  competencia              String // YYYY-MM
+  ds_status                StatusFechamento @default(ABERTO)
+  vl_total_frete           Decimal          @default(0) @db.Decimal(14, 2)
+  vl_total_adiantamentos   Decimal          @default(0) @db.Decimal(14, 2)
+  vl_total_despesas        Decimal          @default(0) @db.Decimal(14, 2)
+  vl_total_descontos       Decimal          @default(0) @db.Decimal(14, 2)
+  vl_total_proventos       Decimal?         @db.Decimal(14, 2)
+  vl_liquido               Decimal          @default(0) @db.Decimal(14, 2)
+  dt_fechamento            DateTime?
+  id_sis_profile_aprovador String?
+
+  tms_empresas            tms_empresas              @relation(fields: [id_tms_empresa], references: [id])
+  tms_motoristas          tms_motoristas            @relation(fields: [id_tms_motoristas], references: [id])
+  sis_profile_aprovador   sis_profiles?             @relation("FechamentoAprovador", fields: [id_sis_profile_aprovador], references: [id])
+  tms_fechamento_viagens  tms_fechamento_viagens[]
+  tms_fechamento_cargas   tms_fechamento_cargas[]
+  tms_fechamentos_titulos tms_fechamentos_titulos[]
+
+  @@unique([id_tms_empresa, id_tms_motoristas, competencia])
+  @@index([id_tms_empresa])
+  @@index([competencia])
+  @@index([ds_status])
+}
+
+model tms_fechamento_viagens {
+  id            String   @id @default(uuid())
+  id_fechamento String
+  id_viagem     String
+  dt_vinculacao DateTime @default(now())
+
+  tms_fechamentos tms_fechamentos @relation(fields: [id_fechamento], references: [id], onDelete: Cascade)
+  tms_viagens     tms_viagens     @relation(fields: [id_viagem], references: [id])
+
+  @@unique([id_fechamento, id_viagem])
+  @@index([id_fechamento])
+  @@index([id_viagem])
+}
+
+model tms_fechamento_cargas {
+  id         String   @id @default(uuid())
+  dt_created DateTime @default(now())
+
+  id_fechamento String
+  id_carga      String
+
+  id_viagem    String?
+  nr_sequencia Int?
+
+  id_motorista_veiculo  String?
+  dt_entregue_em        DateTime?
+  ds_status_carga       StatusCarga
+  fl_deslocamento_vazio Boolean     @default(false)
+
+  vl_base_comissao Decimal? @db.Decimal(14, 2)
+
+  tms_fechamentos tms_fechamentos @relation(fields: [id_fechamento], references: [id], onDelete: Cascade)
+  tms_cargas      tms_cargas      @relation(fields: [id_carga], references: [id], onDelete: Cascade)
+  tms_viagens     tms_viagens?    @relation(fields: [id_viagem], references: [id])
+
+  @@unique([id_fechamento, id_carga])
+  @@index([id_fechamento])
+  @@index([id_carga])
+  @@index([id_viagem])
+}
+
+model tms_fechamentos_titulos {
+  id                    String  @id @default(uuid())
+  id_fechamento         String
+  id_tms_viagem_despesa String
+  id_viagem             String?
+  nr_sequencia          Int?
+
+  tms_fechamentos     tms_fechamentos     @relation(fields: [id_fechamento], references: [id], onDelete: Cascade)
+  tms_viagem_despesas tms_viagem_despesas @relation(fields: [id_tms_viagem_despesa], references: [id])
+  tms_viagens         tms_viagens?        @relation(fields: [id_viagem], references: [id])
+
+  @@unique([id_fechamento, id_tms_viagem_despesa])
+  @@index([id_fechamento])
+}
+
+// // // Status do Manifesto Eletrônico de Documentos Fiscais (MDF-e) -- por enquanto sem uso (TODO MDFE)
+// enum StatusMDFe {
+//   PENDENTE            // MDFe não emitido
+//   AUTORIZADO          // MDFe autorizado pela SEFAZ
+//   CANCELADO           // MDFe cancelado
+//   ENCERRADO           // MDFe encerrado
+// }

@@ -1,0 +1,693 @@
+{
+    "cteProc": {
+        "$": {
+            "versao": "4.00",
+            "xmlns": "http://www.portalfiscal.inf.br/cte"
+        },
+        "CTe": [
+            {
+                "$": {
+                    "xmlns": "http://www.portalfiscal.inf.br/cte"
+                },
+                "infCte": [
+                    {
+                        "$": {
+                            "Id": "CTe42260202914460000401570100187404321548305538",
+                            "versao": "4.00"
+                        },
+                        "ide": [
+                            {
+                                "cUF": [
+                                    "42"
+                                ],
+                                "cCT": [
+                                    "54830553"
+                                ],
+                                "CFOP": [
+                                    "5352"
+                                ],
+                                "natOp": [
+                                    "PRESTACAO SERV ESTAB. INDUSTRIAL"
+                                ],
+                                "mod": [
+                                    "57"
+                                ],
+                                "serie": [
+                                    "10"
+                                ],
+                                "nCT": [
+                                    "18740432"
+                                ],
+                                "dhEmi": [
+                                    "2026-02-02T10:24:09-03:00"
+                                ],
+                                "tpImp": [
+                                    "2"
+                                ],
+                                "tpEmis": [
+                                    "1"
+                                ],
+                                "cDV": [
+                                    "8"
+                                ],
+                                "tpAmb": [
+                                    "1"
+                                ],
+                                "tpCTe": [
+                                    "0"
+                                ],
+                                "procEmi": [
+                                    "0"
+                                ],
+                                "verProc": [
+                                    "1.04"
+                                ],
+                                "cMunEnv": [
+                                    "4217204"
+                                ],
+                                "xMunEnv": [
+                                    "SAO MIGUEL DO OESTE"
+                                ],
+                                "UFEnv": [
+                                    "SC"
+                                ],
+                                "modal": [
+                                    "01"
+                                ],
+                                "tpServ": [
+                                    "0"
+                                ],
+                                "cMunIni": [
+                                    "4217204"
+                                ],
+                                "xMunIni": [
+                                    "SAO MIGUEL DO OESTE"
+                                ],
+                                "UFIni": [
+                                    "SC"
+                                ],
+                                "cMunFim": [
+                                    "4211306"
+                                ],
+                                "xMunFim": [
+                                    "NAVEGANTES"
+                                ],
+                                "UFFim": [
+                                    "SC"
+                                ],
+                                "retira": [
+                                    "1"
+                                ],
+                                "indIEToma": [
+                                    "1"
+                                ],
+                                "toma3": [
+                                    {
+                                        "toma": [
+                                            "3"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "compl": [
+                            {
+                                "xEmi": [
+                                    "JSBARDEL"
+                                ],
+                                "Entrega": [
+                                    {
+                                        "noPeriodo": [
+                                            {
+                                                "tpPer": [
+                                                    "4"
+                                                ],
+                                                "dIni": [
+                                                    "2026-02-02"
+                                                ],
+                                                "dFim": [
+                                                    "2026-02-03"
+                                                ]
+                                            }
+                                        ],
+                                        "semHora": [
+                                            {
+                                                "tpHor": [
+                                                    "0"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "origCalc": [
+                                    "SAO MIGUEL DO OESTE"
+                                ],
+                                "destCalc": [
+                                    "NAVEGANTES"
+                                ],
+                                "xObs": [
+                                    "VG: 32504380 Transporte subcontratado com TOMAZI E TOMAZI TRANSP LTDA, proprietario do veiculo marca RANDON, placa n. MDS9695/TQW6C02, UF SC/SC.TRANSPORTADOR SUBCONTRATADO CONFORME ANEXO 5 ARTIGO 68, DO DECRETO 2870 DE 28/08/2001  HDMU5634020 VALOR SEGURO US  35.000  Procedimento efetuado nos termos dos artigos 57-A e 57-B do Anexo IX do RICMS"
+                                ]
+                            }
+                        ],
+                        "emit": [
+                            {
+                                "CNPJ": [
+                                    "02914460000401"
+                                ],
+                                "IE": [
+                                    "250556901"
+                                ],
+                                "xNome": [
+                                    "SEARA ALIMENTOS LTDA"
+                                ],
+                                "xFant": [
+                                    "SEARA ALIMENTOS LTDA"
+                                ],
+                                "enderEmit": [
+                                    {
+                                        "xLgr": [
+                                            "R SEARA"
+                                        ],
+                                        "nro": [
+                                            "155"
+                                        ],
+                                        "xCpl": [
+                                            "B INDUSTRIAL"
+                                        ],
+                                        "xBairro": [
+                                            "INDUSTRIAL"
+                                        ],
+                                        "cMun": [
+                                            "4217501"
+                                        ],
+                                        "xMun": [
+                                            "SEARA"
+                                        ],
+                                        "CEP": [
+                                            "89770000"
+                                        ],
+                                        "UF": [
+                                            "SC"
+                                        ],
+                                        "fone": [
+                                            "494413000"
+                                        ]
+                                    }
+                                ],
+                                "CRT": [
+                                    "3"
+                                ]
+                            }
+                        ],
+                        "rem": [
+                            {
+                                "CNPJ": [
+                                    "02914460026540"
+                                ],
+                                "IE": [
+                                    "257772561"
+                                ],
+                                "xNome": [
+                                    "SEARA ALIMENTOS LTDA"
+                                ],
+                                "xFant": [
+                                    "SEARA"
+                                ],
+                                "fone": [
+                                    "4931972000"
+                                ],
+                                "enderReme": [
+                                    {
+                                        "xLgr": [
+                                            "R ENGENHEIRO VILMO GASPODINI"
+                                        ],
+                                        "nro": [
+                                            "1070"
+                                        ],
+                                        "xCpl": [
+                                            "PARTE 1"
+                                        ],
+                                        "xBairro": [
+                                            "LINHA CRUZINHAS"
+                                        ],
+                                        "cMun": [
+                                            "4217204"
+                                        ],
+                                        "xMun": [
+                                            "SAO MIGUEL DO OESTE"
+                                        ],
+                                        "CEP": [
+                                            "89900000"
+                                        ],
+                                        "UF": [
+                                            "SC"
+                                        ],
+                                        "cPais": [
+                                            "1058"
+                                        ],
+                                        "xPais": [
+                                            "BRASIL"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "exped": [
+                            {
+                                "CNPJ": [
+                                    "02914460026540"
+                                ],
+                                "IE": [
+                                    "257772561"
+                                ],
+                                "xNome": [
+                                    "SEARA ALIMENTOS LTDA"
+                                ],
+                                "fone": [
+                                    "4931972000"
+                                ],
+                                "enderExped": [
+                                    {
+                                        "xLgr": [
+                                            "R ENGENHEIRO VILMO GASPODINI"
+                                        ],
+                                        "nro": [
+                                            "1070"
+                                        ],
+                                        "xCpl": [
+                                            "PARTE 1"
+                                        ],
+                                        "xBairro": [
+                                            "LINHA CRUZINHAS"
+                                        ],
+                                        "cMun": [
+                                            "4217204"
+                                        ],
+                                        "xMun": [
+                                            "SAO MIGUEL DO OESTE"
+                                        ],
+                                        "CEP": [
+                                            "89900000"
+                                        ],
+                                        "UF": [
+                                            "SC"
+                                        ],
+                                        "cPais": [
+                                            "1058"
+                                        ],
+                                        "xPais": [
+                                            "BRASIL"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "receb": [
+                            {
+                                "CNPJ": [
+                                    "01335341000180"
+                                ],
+                                "IE": [
+                                    "255087888"
+                                ],
+                                "xNome": [
+                                    "PORTONAVE S A  TERMINAIS PORTUARIOS DE N"
+                                ],
+                                "fone": [
+                                    "4721043325"
+                                ],
+                                "enderReceb": [
+                                    {
+                                        "xLgr": [
+                                            "AV PORTUARIA VICENTE COELHO"
+                                        ],
+                                        "nro": [
+                                            "1"
+                                        ],
+                                        "xBairro": [
+                                            "SAO DOMINGOS"
+                                        ],
+                                        "cMun": [
+                                            "4211306"
+                                        ],
+                                        "xMun": [
+                                            "NAVEGANTES"
+                                        ],
+                                        "CEP": [
+                                            "88375000"
+                                        ],
+                                        "UF": [
+                                            "SC"
+                                        ],
+                                        "cPais": [
+                                            "1058"
+                                        ],
+                                        "xPais": [
+                                            "BRASIL"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "dest": [
+                            {
+                                "CNPJ": [
+                                    "02914460010385"
+                                ],
+                                "IE": [
+                                    "254844383"
+                                ],
+                                "xNome": [
+                                    "SEARA ALIMENTOS LTDA"
+                                ],
+                                "fone": [
+                                    "4733447700"
+                                ],
+                                "enderDest": [
+                                    {
+                                        "xLgr": [
+                                            "R BLUMENAU"
+                                        ],
+                                        "nro": [
+                                            "658"
+                                        ],
+                                        "xCpl": [
+                                            "TERREO SALA 01"
+                                        ],
+                                        "xBairro": [
+                                            "SAO JOAO"
+                                        ],
+                                        "cMun": [
+                                            "4208203"
+                                        ],
+                                        "xMun": [
+                                            "ITAJAI"
+                                        ],
+                                        "CEP": [
+                                            "88316000"
+                                        ],
+                                        "UF": [
+                                            "SC"
+                                        ],
+                                        "cPais": [
+                                            "1058"
+                                        ],
+                                        "xPais": [
+                                            "BRASIL"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "vPrest": [
+                            {
+                                "vTPrest": [
+                                    "6251.29"
+                                ],
+                                "vRec": [
+                                    "6251.29"
+                                ],
+                                "Comp": [
+                                    {
+                                        "xNome": [
+                                            "FRETE"
+                                        ],
+                                        "vComp": [
+                                            "6251.29"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "imp": [
+                            {
+                                "ICMS": [
+                                    {
+                                        "ICMS45": [
+                                            {
+                                                "CST": [
+                                                    "40"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "IBSCBS": [
+                                    {
+                                        "CST": [
+                                            "410"
+                                        ],
+                                        "cClassTrib": [
+                                            "410999"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "infCTeNorm": [
+                            {
+                                "infCarga": [
+                                    {
+                                        "vCarga": [
+                                            "154193.94"
+                                        ],
+                                        "proPred": [
+                                            "PE SUINO TRASEIRO"
+                                        ],
+                                        "infQ": [
+                                            {
+                                                "cUnid": [
+                                                    "01"
+                                                ],
+                                                "tpMed": [
+                                                    "PESO BRUTO(Kg)"
+                                                ],
+                                                "qCarga": [
+                                                    "28408.2100"
+                                                ]
+                                            },
+                                            {
+                                                "cUnid": [
+                                                    "01"
+                                                ],
+                                                "tpMed": [
+                                                    "PESO BASE CÁLC.(Kg)"
+                                                ],
+                                                "qCarga": [
+                                                    "0.0000"
+                                                ]
+                                            },
+                                            {
+                                                "cUnid": [
+                                                    "01"
+                                                ],
+                                                "tpMed": [
+                                                    "PESO AFERIDO(Kg)"
+                                                ],
+                                                "qCarga": [
+                                                    "0.0000"
+                                                ]
+                                            },
+                                            {
+                                                "cUnid": [
+                                                    "00"
+                                                ],
+                                                "tpMed": [
+                                                    "CUBAGEM(M3)"
+                                                ],
+                                                "qCarga": [
+                                                    "0.0000"
+                                                ]
+                                            },
+                                            {
+                                                "cUnid": [
+                                                    "03"
+                                                ],
+                                                "tpMed": [
+                                                    "QTDE.VOLUMES(Unid.)"
+                                                ],
+                                                "qCarga": [
+                                                    "0.0000"
+                                                ]
+                                            }
+                                        ],
+                                        "vCargaAverb": [
+                                            "154193.94"
+                                        ]
+                                    }
+                                ],
+                                "infDoc": [
+                                    {
+                                        "infNFe": [
+                                            {
+                                                "chave": [
+                                                    "99999999999999999999999999999999999999999999"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "infModal": [
+                                    {
+                                        "$": {
+                                            "versaoModal": "4.00"
+                                        },
+                                        "rodo": [
+                                            {
+                                                "RNTRC": [
+                                                    "44688918"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "autXML": [
+                            {
+                                "CNPJ": [
+                                    "04896658000184"
+                                ]
+                            }
+                        ],
+                        "infRespTec": [
+                            {
+                                "CNPJ": [
+                                    "00447041000120"
+                                ],
+                                "xContato": [
+                                    "INVENTTI SOLUCOES EMPRESARIAIS LTDA"
+                                ],
+                                "email": [
+                                    "suporte@inventti.com.br"
+                                ],
+                                "fone": [
+                                    "4730387700"
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "infCTeSupl": [
+                    {
+                        "qrCodCTe": [
+                            "https://dfe-portal.svrs.rs.gov.br/cte/qrCode?chCTe=42260202914460000401570100187404321548305538&tpAmb=1"
+                        ]
+                    }
+                ],
+                "Signature": [
+                    {
+                        "$": {
+                            "xmlns": "http://www.w3.org/2000/09/xmldsig#"
+                        },
+                        "SignedInfo": [
+                            {
+                                "CanonicalizationMethod": [
+                                    {
+                                        "$": {
+                                            "Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+                                        }
+                                    }
+                                ],
+                                "SignatureMethod": [
+                                    {
+                                        "$": {
+                                            "Algorithm": "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
+                                        }
+                                    }
+                                ],
+                                "Reference": [
+                                    {
+                                        "$": {
+                                            "URI": "#CTe42260202914460000401570100187404321548305538"
+                                        },
+                                        "Transforms": [
+                                            {
+                                                "Transform": [
+                                                    {
+                                                        "$": {
+                                                            "Algorithm": "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
+                                                        }
+                                                    },
+                                                    {
+                                                        "$": {
+                                                            "Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "DigestMethod": [
+                                            {
+                                                "$": {
+                                                    "Algorithm": "http://www.w3.org/2000/09/xmldsig#sha1"
+                                                }
+                                            }
+                                        ],
+                                        "DigestValue": [
+                                            "SD+bABeJh59VSs6FnCvrtLiv4VU="
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "SignatureValue": [
+                            "ZPYOYgWVGHo4eJ8eh0M84I+AzTv54DnJrvxlQ38cfnL2geT6+uljHhllh+FavElPP2LJMG1VCXjdDgJ9CN0AF2KxxvSRyowB8TxXTl7wd/kvrpv0D3Dw7p/TJk03hv/5XihkvQ+oadaZySYAObgH19boAJ+Rp9IaAQRcXc8Fr8bG6NPqLqW+xI33ain6UL8nBzD6d4b233z45irIPRJygHSKiuG41qVin/mZJmmDx3nNa5DpPXOv7+wgrHN1bsQk/Q7UMJb1aRVwlEQuUVTMv4KFIvgTo046gJbCmHfOyfbg0C140qCQpU9mukyKLXYpJ66t62fiQB9ocSdt/NltFg=="
+                        ],
+                        "KeyInfo": [
+                            {
+                                "X509Data": [
+                                    {
+                                        "X509Certificate": [
+                                            "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"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "protCTe": [
+            {
+                "$": {
+                    "versao": "4.00",
+                    "xmlns": "http://www.portalfiscal.inf.br/cte"
+                },
+                "infProt": [
+                    {
+                        "$": {
+                            "Id": "CTe342260055927408"
+                        },
+                        "tpAmb": [
+                            "1"
+                        ],
+                        "verAplic": [
+                            "RS20260105155901"
+                        ],
+                        "chCTe": [
+                            "42260202914460000401570100187404321548305538"
+                        ],
+                        "dhRecbto": [
+                            "2026-02-02T10:24:18-03:00"
+                        ],
+                        "nProt": [
+                            "342260055927408"
+                        ],
+                        "digVal": [
+                            "SD+bABeJh59VSs6FnCvrtLiv4VU="
+                        ],
+                        "cStat": [
+                            "100"
+                        ],
+                        "xMotivo": [
+                            "Autorizado o uso do CT-e"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

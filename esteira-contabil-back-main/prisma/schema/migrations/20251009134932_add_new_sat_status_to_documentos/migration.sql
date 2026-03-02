@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "StatusDocumento" ADD VALUE 'AGURADANDO_EXTRACAO';

@@ -1,0 +1,44 @@
+import express from 'express';
+import empresaRoutes from './sistema/empresa.routes';
+import administrativoRoutes from './administrativo/administrativo.routes';
+import escritorioRoutes from './sistema/escritorio.routes';
+import moduleRoutes from './sistema/modulo.routes';
+import usuarioRoutes from './sistema/usuario.routes';
+import cadastroRoutes from './sistema/cadastro.routes';
+import sincronizarRoutes from './sincronizar.routes';
+import fiscalRoutes from './fiscal/fiscal.routes';
+import rhRoutes from './rh/rh.routes';
+import embarcadorRoutes from './embarcador/index';
+import sisEmbarcadorRoutes from './sistema/sis-embarcador.routes';
+import contabilRoutes from './contabil/contabil.routes';
+import fileUploadRoutes from './file-upload.routes';
+import notificationRoutes from './sistema/notifiacoes.routes';
+import integracaoRoutes from './sistema/integracao/integracao.routes';
+import transporteRoutes from './transporte/transporte.routes';
+import modulesRoutes from './sistema/modules.routes';
+import tmsRoutes from './tms/tms.routes';
+import reformaTributariaRoutes from './reforma-tributaria/reformaTributaria.routes';
+
+const router = express.Router();
+
+router.use('/empresas', empresaRoutes);
+router.use('/administrativo', administrativoRoutes);
+router.use('/escritorios', escritorioRoutes);
+router.use('/modulos', moduleRoutes);
+router.use('/usuarios', usuarioRoutes);
+router.use('/sincronizar', sincronizarRoutes);
+router.use('/rh', rhRoutes);
+router.use('/fiscal', fiscalRoutes);
+router.use('/contabilidade', contabilRoutes);
+router.use('/geral', cadastroRoutes);
+router.use('/embarcador', embarcadorRoutes);
+router.use('/sis-embarcador', sisEmbarcadorRoutes);
+router.use('/import', fileUploadRoutes);
+router.use('/notificacoes', notificationRoutes);
+router.use('/integracao', integracaoRoutes);
+router.use('/transporte', transporteRoutes);
+router.use('/modules', modulesRoutes);
+router.use('/tms', tmsRoutes);
+router.use('/reforma-tributaria', reformaTributariaRoutes);
+
+export default router;

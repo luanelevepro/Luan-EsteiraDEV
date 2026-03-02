@@ -1,0 +1,1075 @@
+model fis_empresas {
+  id                         String                       @id @default(uuid())
+  dt_created                 DateTime                     @default(now())
+  dt_updated                 DateTime                     @default(now()) @updatedAt
+  id_sis_empresas            String                       @unique
+  sis_empresas               sis_empresas                 @relation(fields: [id_sis_empresas], references: [id])
+  fis_segmentos_empresas     fis_segmentos_empresas[]
+  fis_prd_segmento           fis_prd_segmento[]
+  fis_produtos               fis_produtos[]
+  fis_nfse                   fis_nfse[]
+  fis_nfse_emitente          fis_nfse[]                   @relation("NfseEmpresaEmitente")
+  fis_documento              fis_documento[]
+  fis_fornecedores           fis_fornecedores[]
+  fis_empresas_tecnospeed    fis_empresas_tecnospeed[]
+  fis_nfe_produto_fornecedor fis_nfe_produto_fornecedor[]
+  fis_nfe                    fis_nfe[]                    @relation("NfeEmpresaEmitente")
+  fis_nfe_destinatario       fis_nfe[]                    @relation("NfeEmpresaDestinatario")
+  fis_cte                    fis_cte[]                    @relation("CteEmpresaEmitente")
+  fis_cte_destinatario       fis_cte[]                    @relation("CteEmpresaDestinatario")
+  fis_cte_remetente          fis_cte[]                    @relation("CteEmpresaRemetente")
+  fis_cte_tomador            fis_cte[]                    @relation("CteEmpresaTomador")
+  fis_cte_subcontratada      fis_cte[]                    @relation("CteEmpresaSubcontratada")
+  fis_regras_entrada_nfe     fis_regras_entrada_nfe[]
+  fis_nfe_transportador      fis_nfe[]                    @relation("NfeEmpresaTransportadora")
+  fis_integracao_documentos  fis_integracao_documentos[]
+  fis_clientes               fis_clientes[]
+}
+
+/// Cadastro fiscal de clientes (tomadores/destinatários) vindos dos XMLs
+model fis_clientes {
+  id                       String         @id @default(uuid())
+  dt_created               DateTime       @default(now())
+  dt_updated               DateTime       @default(now()) @updatedAt
+  id_fis_empresas          String
+  fis_empresas             fis_empresas   @relation(fields: [id_fis_empresas], references: [id])
+  id_externo               String?
+  ds_nome                  String
+  ds_documento             String?
+  ds_ie                    String?
+  ds_nome_fantasia         String?
+  id_cidade                Int?
+  sis_igbe_city            sis_igbe_city? @relation("FisClientesCidade", fields: [id_cidade], references: [id])
+  ds_cep                   String?
+  ds_logradouro            String?
+  ds_numero                String?
+  ds_complemento           String?
+  ds_bairro                String?
+  ds_uf                    String?
+  ds_telefone              String?
+  ds_email                 String?
+  cd_municipio_ibge        String?
+  ds_origem_cadastro       String?
+  dt_ultima_ocorrencia_xml DateTime?
+
+  tms_cargas tms_cargas[]
+
+  @@unique([id_fis_empresas, ds_documento])
+  @@index([id_fis_empresas])
+}
+
+model fis_segmentos_empresas {
+  id                     String                   @id @default(uuid())
+  dt_created             DateTime                 @default(now())
+  dt_updated             DateTime                 @default(now()) @updatedAt
+  ds_descricao           String
+  fis_empresas           fis_empresas?            @relation(fields: [id_fis_empresas], references: [id])
+  id_fis_empresas        String?
+  fis_prd_segmentos      fis_prd_segmento[]       @relation("prd_segmento")
+  fis_regras_entrada_nfe fis_regras_entrada_nfe[]
+
+  sis_empresas sis_empresas[]
+}
+
+model fis_nfe_produto_fornecedor {
+  id                String           @id @default(uuid())
+  dt_created        DateTime         @default(now())
+  dt_updated        DateTime         @updatedAt
+  id_fis_empresas   String
+  ds_ordem_origem   Int?
+  fl_conversao      Boolean
+  ds_conversao      String?
+  id_nfe            String?
+  fis_nfe           fis_nfe?         @relation(fields: [id_nfe], references: [id])
+  fis_empresas      fis_empresas     @relation(fields: [id_fis_empresas], references: [id])
+  id_fis_produto    String
+  fis_produtos      fis_produtos     @relation(fields: [id_fis_produto], references: [id])
+  id_fis_fornecedor String
+  fis_fornecedor    fis_fornecedores @relation(fields: [id_fis_fornecedor], references: [id])
+  ds_codigo_produto String?
+
+  @@unique([id_fis_empresas, id_fis_produto, id_fis_fornecedor, ds_codigo_produto], name: "uniq_produto_fornecedor")
+}
+
+model fis_nfse {
+  id                                String        @id @default(uuid())
+  dt_created                        DateTime      @default(now())
+  dt_updated                        DateTime      @updatedAt
+  id_fis_empresas                   String?
+  fis_empresas                      fis_empresas? @relation(fields: [id_fis_empresas], references: [id])
+  id_fis_empresa_emitente           String?
+  fis_empresa_emitente              fis_empresas? @relation("NfseEmpresaEmitente", fields: [id_fis_empresa_emitente], references: [id])
+  ds_documento_emitente             String?
+  ds_razao_social_emitente          String?
+  ds_documento_tomador              String?
+  ds_razao_social_tomador           String?
+  ds_numero                         String?
+  ds_codigo_verificacao             String?
+  dt_emissao                        DateTime?
+  ds_base_calculo                   String?
+  ds_aliquota                       String?
+  ds_valor_liquido_nfse             String?
+  ds_orgao_gerador_codigo_municipio String?
+  ds_orgao_gerador_uf               String?
+  dt_competencia                    DateTime?
+  ds_valor_servicos                 String?
+  ds_valor_deducoes                 String?
+  ds_valor_retencoes                String?
+  ds_valor_descontos                String?
+  ds_valor_pis                      String?
+  ds_valor_cofins                   String?
+  ds_valor_inss                     String?
+  ds_valor_ir                       String?
+  ds_valor_csll                     String?
+  ds_valor_iss                      String?
+  ds_outras_retencoes               String?
+  ds_desconto_incondicionado        String?
+  ds_desconto_condicionado          String?
+  is_iss_retido                     Boolean?
+  ds_responsavel_retencao           String?
+  ds_item_lista_servico             String?
+  ds_discriminacao                  String?
+  ds_codigo_municipio               String?
+  ds_exigibilidade_iss              String?
+  ds_municipio_incidencia           String?
+  is_optante_simples_nacional       Boolean?
+  is_incentivo_fiscal               Boolean?
+  ds_valor_credito                  String?
+  ds_rps_numero                     String?
+  ds_rps_serie                      String?
+  ds_rps_tipo                       String?
+  dt_rps_emissao                    DateTime?
+  ds_rps_status                     String?
+  ds_codigo_cnae                    String?
+  ds_codigo_tributacao_municipio    String?
+  js_servicos                       Json?
+  ds_id_processamento               String?
+  id_fis_fornecedor                 String?
+  ds_origem                         NfseOrigem?
+
+  // Cancelamento
+  dt_cancelamento               DateTime?
+  cd_codigo_cancelamento        String?
+  ds_justificativa_cancelamento String?
+  ds_protocolo_cancelamento     String?
+  ds_xml_cancelamento           String?   @db.Text
+  ds_status_cancelamento        String? // PENDENTE | PROCESSADO | REJEITADO
+
+  fis_fornecedor            fis_fornecedores?           @relation(fields: [id_fis_fornecedor], references: [id])
+  fis_documento             fis_documento[]
+  fis_integracao_documentos fis_integracao_documentos[]
+  fis_documento_dfe         fis_documento_dfe[]
+  fis_auditoria_doc         fis_auditoria_doc[]
+  tms_viagem_despesas       tms_viagem_despesas[]
+
+  @@unique([id_fis_empresas, ds_numero, dt_emissao])
+  @@unique([id_fis_empresa_emitente, ds_numero, dt_emissao])
+  @@index([dt_cancelamento, ds_status_cancelamento])
+}
+
+model fis_nfe {
+  id                            String                       @id @default(uuid())
+  dt_created                    DateTime                     @default(now())
+  dt_updated                    DateTime                     @updatedAt
+  id_fis_empresa_emitente       String?
+  fis_empresa_emitente          fis_empresas?                @relation("NfeEmpresaEmitente", fields: [id_fis_empresa_emitente], references: [id])
+  id_fis_empresa_destinatario   String? // empresa destinatária da NFe (se for o caso)
+  fis_empresa_destinatario      fis_empresas?                @relation("NfeEmpresaDestinatario", fields: [id_fis_empresa_destinatario], references: [id])
+  id_fis_empresa_transportadora String? // empresa transportadora da NFe (se for o caso)
+  fis_empresa_transportadora    fis_empresas?                @relation("NfeEmpresaTransportadora", fields: [id_fis_empresa_transportadora], references: [id])
+  ds_id_nfe                     String? // atributo infNFe.@Id (ex: "NFe4225068535…")
+  ds_chave                      String?                      @unique
+  js_nfes_referenciadas         Json? // array de chaves de NFes referenciadas
+  ds_uf                         String? // <ide><cUF>
+  cd_nf                         String? // <ide><cNF>
+  ds_natureza_operacao          String? // <ide><natOp>
+  ds_modelo                     String? // <ide><mod>
+  ds_serie                      String? // <ide><serie>
+  ds_numero                     String? // <ide><nNF>
+  dt_emissao                    DateTime? // <ide><dhEmi>
+  dt_saida_entrega              DateTime? // <ide><dhSaiEnt>
+  cd_tipo_operacao              String? // <ide><idDest>
+  cd_municipio                  String? // <ide><cMunFG>
+  ds_fin_nfe                    String? // <ide><finNFe>
+  vl_base_calculo               String? // <total><ICMSTot><vBC>
+  vl_produto                    String? // <total><ICMSTot><vProd>
+  vl_nf                         String? // <total><ICMSTot><vNF>
+  vl_frete                      String? // <total><ICMSTot><vFrete>
+  vl_seg                        String? // <total><ICMSTot><vSeg>
+  vl_desc                       String? // <total><ICMSTot><vDesc>
+  vl_ii                         String? // <total><ICMSTot><vII>
+  vl_ipi                        String? // <total><ICMSTot><vIPI>
+  vl_ipidevol                   String? // <total><ICMSTot><vIPIDevol>
+  vl_pis                        String? // <total><ICMSTot><vPIS>
+  vl_cofins                     String? // <total><ICMSTot><vCOFINS>
+  vl_outros                     String? // <total><ICMSTot><vOutro>
+  vl_bc                         String? // <total><ICMSTot><vBC>
+  vl_icms                       String? // <total><ICMSTot><vICMS>
+  vl_icms_desoner               String? // <total><ICMSTot><vICMSDeson>
+  ds_base_calculo_mono_total    String? // <prod><vBC><vMono>
+  ds_porcentagem_mono_total     String? // <prod><pMono>
+  js_itens                      Json?
+  ds_documento_emitente         String? // <emit><CNPJ> ou <emit><CPF>
+  ds_razao_social_emitente      String? // <emit><xNome>
+  cd_crt_emitente               String? // <emit><CRT>
+  ds_uf_emitente                String?
+  ds_municipio_emitente         String?
+  ds_documento_destinatario     String? // <dest><CNPJ> ou <dest><CPF>
+  ds_razao_social_destinatario  String? // <dest><xNome>
+  ds_documento_transportador    String?
+  ds_razao_social_transportador String?
+  id_fis_fornecedor             String? // fornecedor que emitiu a NFe
+  fis_fornecedor                fis_fornecedores?            @relation(fields: [id_fis_fornecedor], references: [id])
+  fis_nfe_itens                 fis_nfe_itens[]
+  fis_documento                 fis_documento[]
+  fis_nfe_produto_fornecedor    fis_nfe_produto_fornecedor[]
+  fis_integracao_documentos     fis_integracao_documentos[]
+  fis_documento_dfe             fis_documento_dfe[]
+  fis_auditoria_doc             fis_auditoria_doc[]
+  tms_cargas_nfe                tms_cargas_nfe[]
+  tms_entregas_nfe              tms_entregas_nfe[]
+
+  @@unique([id_fis_empresa_destinatario, ds_numero, dt_emissao], name: "uniq_nfe_por_empresa_destinatario")
+  @@unique([id_fis_empresa_emitente, ds_numero, dt_emissao], name: "uniq_nfe_por_empresa_emitente")
+}
+
+model fis_nfe_itens {
+  id                           String   @id @default(uuid())
+  dt_created                   DateTime @default(now())
+  dt_updated                   DateTime @updatedAt
+  ds_ordem                     Int? // <prod><nItem>
+  id_fis_nfe                   String
+  fis_nfe                      fis_nfe  @relation(fields: [id_fis_nfe], references: [id])
+  ds_produto                   String? // <prod><xProd>
+  cd_produto_anp               String? // <prod><cProdANP>
+  ds_produto_anp_descricao     String? // <prod><descANP>
+  ds_codigo                    String? // <prod><cProd>
+  ds_unidade                   String? // <prod><uCom>
+  vl_base_calculo_icms         String? // <prod><vBC>
+  vl_quantidade                String? // <prod><qCom>
+  vl_unitario                  String? // <prod><vUnCom>
+  vl_total                     String? // <prod><vProd>
+  vl_icms                      String? // <prod><vICMS>
+  ds_icms_tag                  String? // <prod><ICMS><tag>
+  ds_cst                       String? // <prod><ICMS><CST>
+  ds_origem                    String? // <prod><ICMS><orig>
+  vl_pis                       String? // <prod><PIS><vPIS>
+  vl_porcentagem_pis           String? // <prod><PIS><pPIS>
+  vl_base_calculo_pis          String? // <prod><PIS><vBC>
+  cd_cst_pis                   String? // <prod><PIS><CST>
+  vl_cofins                    String? // <prod><COFINS><vCOFINS>
+  vl_porcentagem_cofins        String? // <prod><COFINS><pCOFINS>
+  vl_base_calculo_cofins       String? // <prod><COFINS><vBC>
+  cd_cst_cofins                String? // <prod><COFINS><CST>
+  ds_unidade_tributavel        String? // <prod><uTrib>
+  vl_quantidade_tributavel     String? // <prod><qTrib>
+  vl_total_tributavel          String? // <prod><vTotTrib>
+  vl_unitario_tributavel       String? // <prod><vUnTrib>
+  ds_porcentagem_icms          String? // <prod><pICMS>
+  ds_enquadramento_ipi         String? // <ipi><cEnq>
+  ds_ipi_nao_tributavel_cst    String? // <prod><IPI><cST>
+  ds_pis_nao_tributavel_cst    String? // <prod><PIS><CST>
+  ds_cofins_nao_tributavel_cst String? // <prod><COFINS><CST>
+  ds_base_calculo_mono         String? // <prod><vBC><vMono>
+  ds_porcentagem_mono          String? // <prod><pMono>
+  vl_icms_mono                 String? // <prod><vMono>
+  cd_ncm                       String? // <prod><NCM>
+  cd_cest                      String? // <prod><CEST>
+  cd_cfop                      String? // <prod><CFOP>
+  cd_barras                    String? // <prod><cEAN>
+  vl_desconto                  String? // <prod><vDesc>
+
+  fis_nfe_itens_alter_entrada fis_nfe_itens_alter_entrada[]
+  tms_viagem_despesas         tms_viagem_despesas[]
+}
+
+model fis_nfe_itens_alter_entrada {
+  id                      String                  @id @default(uuid())
+  dt_created              DateTime                @default(now())
+  dt_updated              DateTime                @updatedAt
+  id_nfe_item             String
+  fis_nfe_itens           fis_nfe_itens           @relation(fields: [id_nfe_item], references: [id])
+  id_regra_nfe_entrada    String?
+  fis_regras_entrada_nfe  fis_regras_entrada_nfe? @relation(fields: [id_regra_nfe_entrada], references: [id])
+  fl_conversao            Boolean?
+  ds_conversao            String?
+  ds_quantidade_alterada  String?
+  id_cfop_alterado        String?
+  sis_cfop                sis_cfop?               @relation("CfopAlterado", fields: [id_cfop_alterado], references: [id])
+  ds_codigo_cfop_alterado String? // dado da tabela de sis_cfop que é uma replicação de ds_codigo
+  id_cst_gerado           String?
+  sis_cst                 sis_cst?                @relation("CstGerado", fields: [id_cst_gerado], references: [id])
+  ds_codigo_cst_gerado    String? // dado da tabela de sis_cst que é uma replicação de ds_codigo
+  id_produto_alterado     String?
+  fis_produtos            fis_produtos?           @relation(fields: [id_produto_alterado], references: [id])
+  cd_produto_alterado     String? // dado da tabela de fis_produtos que é uma replicação de id_externo
+
+  @@unique(id_nfe_item, name: "uniq_alteracao_por_item_nfe")
+}
+
+model fis_cte {
+  id                            String                         @id @default(uuid())
+  dt_created                    DateTime                       @default(now())
+  dt_updated                    DateTime                       @updatedAt
+  id_fis_empresa_emitente       String?
+  fis_empresa_emitente          fis_empresas?                  @relation("CteEmpresaEmitente", fields: [id_fis_empresa_emitente], references: [id])
+  id_fis_empresa_destinatario   String? // empresa destinatária da NFe (se for o caso)
+  fis_empresa_destinatario      fis_empresas?                  @relation("CteEmpresaDestinatario", fields: [id_fis_empresa_destinatario], references: [id])
+  id_fis_empresa_remetente      String? // empresa remetente do CTe (se for o caso)
+  fis_empresa_remetente         fis_empresas?                  @relation("CteEmpresaRemetente", fields: [id_fis_empresa_remetente], references: [id])
+  id_fis_empresa_tomador        String? // empresa tomadora do serviço de transporte (se for o caso)
+  fis_empresa_tomador           fis_empresas?                  @relation("CteEmpresaTomador", fields: [id_fis_empresa_tomador], references: [id])
+  id_fis_empresa_subcontratada  String? // empresa subcontratada do serviço de transporte (se for o caso)
+  fis_empresa_subcontratada     fis_empresas?                  @relation("CteEmpresaSubcontratada", fields: [id_fis_empresa_subcontratada], references: [id])
+  id_fis_fornecedor             String? // fornecedor que emitiu o CTe
+  fis_fornecedor                fis_fornecedores?              @relation(fields: [id_fis_fornecedor], references: [id])
+  ds_id_cte                     String                         @unique // InfCte.@Id
+  ds_chave                      String                         @unique // Chave de acesso (44 dígitos)
+  js_chaves_nfe                 Json? // Array de chaves de acesso das NFes associadas (infNFe)
+  js_documentos_anteriores      Json? // <docAnt>
+  ds_observacao                 String?
+  js_documentos_autorizados     Json?
+  js_placas_veiculos            Json?
+  id_motorista                  String?
+  tms_motoristas                tms_motoristas?                @relation(fields: [id_motorista], references: [id])
+  ds_nome_motorista             String?
+  ds_documento_motorista        String?
+  ds_uf                         String? // <ide><cUF>
+  cd_ibge                       String? // <ide><cMun>
+  cd_cte                        String? // <ide><cCT>
+  ds_cfop                       String? // <ide><CFOP>
+  ds_icms_tag                   String? // <ide><ICMS>
+  ds_natureza_operacao          String? // <ide><natOp>
+  ds_modelo                     Int? // <ide><mod>
+  ds_serie                      Int? // <ide><serie>
+  ds_numero                     String? // <ide><nCT>
+  dt_emissao                    DateTime? // <ide><dhEmi>
+  ds_tp_cte                     Int? // <ide><tpCTe>
+  ds_modal                      String? // <ide><modal>
+  ds_tp_serv                    Int? // <ide><tpServ>
+  cd_mun_env                    String? // <ide><cMunEnv>
+  ds_nome_mun_env               String? // <ide><xMunEnv>
+  ds_uf_env                     String? // <ide><UFEnv>
+  cd_mun_ini                    String? // <ide><cMunIni>
+  ds_nome_mun_ini               String? // <ide><xMunIni>
+  ds_uf_ini                     String? // <ide><UFIni>
+  cd_mun_fim                    String? // <ide><cMunFim>
+  ds_nome_mun_fim               String? // <ide><xMunFim>
+  ds_uf_fim                     String? // <ide><UFFim>
+  ds_retira                     Int? // <ide><retira>
+  ds_ind_ie_toma                Int? // <ide><indIEToma>
+  ds_documento_emitente         String? // <emit><CNPJ> ou <emit><CPF>
+  ds_razao_social_emitente      String? // <emit><xNome>
+  ds_documento_remetente        String? // <toma><CNPJ> ou <toma><CPF>
+  ds_razao_social_remetente     String? // <toma><xNome>
+  ds_endereco_remetente         String? // endereço do remetente (toma): rem.enderReme (xLgr, nro, xBairro, xMun, UF, CEP)
+  ds_complemento_remetente      String? // complemento (xCpl) do endereço remetente
+  ds_documento_destinatario     String? // <dest><CNPJ> ou <dest><CPF>
+  ds_razao_social_destinatario  String? // <dest><xNome>
+  ds_documento_tomador          String? // <toma><CNPJ> ou <toma><CPF> (ou toma4)
+  ds_razao_social_tomador       String? // <toma><xNome>
+  ds_documento_expedidor        String? // <exped><CNPJ> ou <exped><CPF>
+  ds_razao_social_expedidor     String? // <exped><xNome>
+  ds_documento_recebedor        String? // <receb><CNPJ> ou <receb><CPF>
+  ds_razao_social_recebedor     String? // <receb><xNome>
+  ds_endereco_destino           String? // endereço do destino da entrega (receb.enderReceb ou dest.enderDest: xLgr, nro, xBairro)
+  ds_complemento_destino        String? // complemento (xCpl) do endereço destino
+  ds_razao_social_subcontratada String?
+  ds_documento_subcontratada    String?
+  vl_total                      String? // <vPrest><vTPrest>
+  vl_rec                        String? // <vPrest><vRec>
+  vl_total_trib                 String? // valor total dos tributos (<imp><vTotTrib>)
+  ds_cst_tributacao             String? // <imp><ICMS><CST>
+  vl_base_calculo_icms          String? // <imp><ICMS><vBC>
+  vl_icms                       String? // <imp><ICMS><vICMS>
+  cd_icms                       String? // <imp><ICMS><CST>
+  vl_porcentagem_icms           String? // <imp><ICMS><pICMS>
+  fis_cte_comp_carga            fis_cte_comp_carga[]
+  fis_cte_carga                 fis_cte_carga[]
+  fis_documento                 fis_documento[]
+  fis_integracao_documentos     fis_integracao_documentos[]
+  fis_documento_dfe             fis_documento_dfe[]
+  fis_auditoria_doc             fis_auditoria_doc[]
+  fis_cte_subcontratacao_alters fis_cte_subcontratacao_alter[]
+  tms_cargas_ctes               tms_cargas_cte[]
+  tms_entregas_cte              tms_entregas_cte[]
+
+  @@unique([id_fis_empresa_emitente, ds_numero, dt_emissao], name: "uniq_cte_por_empresa_emitente")
+  @@unique([id_fis_empresa_destinatario, ds_numero, dt_emissao], name: "uniq_cte_por_empresa_destinatario")
+  @@index([ds_chave])
+}
+
+model fis_cte_subcontratacao_alter {
+  id         String   @id @default(uuid())
+  dt_created DateTime @default(now())
+  dt_updated DateTime @updatedAt
+  // Documento modificado
+  id_fis_cte String
+  fis_cte    fis_cte  @relation(fields: [id_fis_cte], references: [id])
+
+  // Valores originais (antes da alteração)
+  ds_documento_subcontratada_original    String?
+  ds_razao_social_subcontratada_original String?
+  id_fis_empresa_subcontratada_original  String?
+
+  // Valores alterados
+  ds_documento_subcontratada_alterada    String?
+  ds_razao_social_subcontratada_alterada String?
+  id_fis_empresa_subcontratada_alterada  String?
+
+  // Status da alteração
+  ds_status_alteracao StatusAlteracaoSubcontratacao @default(PENDENTE)
+
+  // Informações extras para auditoria
+  id_usuario_solicitante           String?
+  sis_profiles_usuario_solicitante sis_profiles? @relation(name: "Solicitante", fields: [id_usuario_solicitante], references: [id])
+  id_usuario_aprovador             String?
+  sis_profiles_usuario_aprovador   sis_profiles? @relation(name: "Aprovador", fields: [id_usuario_aprovador], references: [id])
+  ds_motivo                        String?
+  ds_observacao_aprovador          String?
+}
+
+/// Componentes de valor
+model fis_cte_comp_carga {
+  id         String  @id @default(uuid())
+  ds_nome    String
+  vl_comp    String
+  id_fis_cte String
+  fis_cte    fis_cte @relation(fields: [id_fis_cte], references: [id])
+
+  @@index([id_fis_cte])
+}
+
+/// Itens de carga (antes em js_carga)
+model fis_cte_carga {
+  id               String  @id @default(uuid())
+  ds_und           String // unidade de medida (ex: “01”)
+  ds_tipo_medida   String // tipo de medida (ex: “PESO BRUTO”)
+  vl_qtd_carregada String // quantidade carregada
+  id_fis_cte       String
+  fis_cte          fis_cte @relation(fields: [id_fis_cte], references: [id])
+
+  @@index([id_fis_cte])
+}
+
+model fis_documento {
+  id                        String                      @id @default(uuid())
+  dt_created                DateTime                    @default(now())
+  dt_updated                DateTime                    @default(now()) @updatedAt
+  ds_tipo                   TipoDocumento?
+  ds_status                 StatusDocumento?
+  ds_origem                 Json?
+  id_nfse                   String?
+  js_nfse                   fis_nfse?                   @relation(fields: [id_nfse], references: [id])
+  id_nfe                    String?
+  js_nfe                    fis_nfe?                    @relation(fields: [id_nfe], references: [id])
+  id_cte                    String?
+  js_cte                    fis_cte?                    @relation(fields: [id_cte], references: [id])
+  id_fis_empresas           String
+  fis_empresas              fis_empresas                @relation(fields: [id_fis_empresas], references: [id])
+  fis_documento_dfe         fis_documento_dfe[]
+  ds_tipo_ef                TipoEf?                     @default(ENTRADA)
+  fis_evento                fis_evento[]
+  fis_integracao_documentos fis_integracao_documentos[]
+  fis_sat_conferencia_item  fis_sat_conferencia_item[]
+  fis_auditoria_doc         fis_auditoria_doc[]
+  fis_documento_historico   fis_documento_historico[]
+
+  @@unique([id_nfse, id_fis_empresas], name: "uniq_nfse_por_empresa")
+  @@unique([id_nfe, id_fis_empresas], name: "uniq_nfe_por_empresa")
+  @@unique([id_cte, id_fis_empresas], name: "uniq_cte_por_empresa")
+}
+
+model fis_documento_historico {
+  id                 String           @id @default(uuid())
+  dt_created         DateTime         @default(now())
+  id_fis_documento   String
+  fis_documento      fis_documento    @relation(fields: [id_fis_documento], references: [id])
+  ds_status_anterior StatusDocumento?
+  ds_status_novo     StatusDocumento?
+  ds_motivo          String?
+  id_usuario         String?
+  js_profile         sis_profiles?    @relation(fields: [id_usuario], references: [id])
+}
+
+model fis_documentos_relacionados {
+  id                         String            @id @default(uuid())
+  dt_created                 DateTime          @default(now())
+  dt_updated                 DateTime          @updatedAt
+  fl_ativo                   Boolean           @default(true)
+  ds_origem                  OrigemVinculo     @default(XML)
+  id_documento_origem        String
+  fis_documento_origem       fis_documento_dfe @relation("DocumentoOrigem", fields: [id_documento_origem], references: [id])
+  id_documento_referenciado  String
+  fis_documento_referenciado fis_documento_dfe @relation("DocumentoReferenciado", fields: [id_documento_referenciado], references: [id])
+}
+
+enum OrigemVinculo {
+  XML
+  MANUAL
+}
+
+model fis_prd_segmento {
+  id                   String                   @id @default(uuid())
+  dt_created           DateTime                 @default(now())
+  dt_updated           DateTime                 @default(now()) @updatedAt
+  ds_descricao         String
+  id_fis_empresas      String?
+  sis_tipos_produto    sis_tipos_produto?       @relation(fields: [id_sis_tipos_produto], references: [id])
+  id_sis_tipos_produto String?
+  sis_tipos_servico    sis_tipos_servicos?      @relation(fields: [id_sis_tipos_servico], references: [id])
+  id_sis_tipos_servico String?
+  fis_empresas         fis_empresas?            @relation(fields: [id_fis_empresas], references: [id])
+  fis_segmentos        fis_segmentos_empresas[] @relation("prd_segmento")
+}
+
+model fis_produtos {
+  id                         String                        @id @default(uuid())
+  dt_created                 DateTime                      @default(now())
+  dt_updated                 DateTime                      @default(now()) @updatedAt
+  id_externo                 String?
+  cd_identificador           String?
+  id_empresa_externo         String?
+  ds_nome                    String
+  ds_unidade                 String
+  cd_ncm                     String?
+  ds_status                  StatusProduto                 @default(ATIVO)
+  cd_cest                    String?
+  dt_cadastro                DateTime?
+  ds_tipo_item               Int?
+  ds_codigo_barras           String?
+  sis_tipos_servico          sis_tipos_servicos?           @relation(fields: [id_sis_tipos_servico], references: [id])
+  id_sis_tipos_servico       String?
+  id_fis_empresas            String
+  fis_empresas               fis_empresas                  @relation(fields: [id_fis_empresas], references: [id])
+  fis_nfe_produto_fornecedor fis_nfe_produto_fornecedor[]
+  fis_nfe_itens_alter        fis_nfe_itens_alter_entrada[]
+  rtc_produtos_classificacao rtc_produtos_classificacao?
+}
+
+model fis_fornecedores {
+  id                         String                       @id @default(uuid())
+  dt_created                 DateTime                     @default(now())
+  dt_updated                 DateTime                     @updatedAt
+  id_externo                 String?
+  id_empresa_externo         String?
+  ds_nome                    String?
+  ds_endereco                String?
+  ds_cep                     String?
+  ds_inscricao               String?
+  ds_telefone                String?
+  ds_inscricao_municipal     String?
+  ds_bairro                  String?
+  ds_email                   String?
+  ds_codigo_municipio        Int?
+  ds_complemento             String?
+  dt_cadastro                DateTime?
+  ds_ibge                    Int?
+  ds_documento               String
+  ds_codigo_uf               Int?
+  ds_status                  StatusFornecedor?            @default(ATIVO)
+  id_fis_empresas            String
+  fis_empresas               fis_empresas                 @relation(fields: [id_fis_empresas], references: [id])
+  fis_nfse                   fis_nfse[]
+  fis_tecnospeed_request     fis_tecnospeed_request[]
+  fis_nfe_produto_fornecedor fis_nfe_produto_fornecedor[]
+  fis_nfe                    fis_nfe[]
+  fis_cte                    fis_cte[]
+
+  @@unique([id_fis_empresas, ds_documento])
+}
+
+model fis_empresas_tecnospeed {
+  id                        String                   @id @default(uuid())
+  dt_created                DateTime                 @default(now())
+  dt_updated                DateTime                 @updatedAt
+  id_tecnospeed_certificado String?
+  dt_certificado_expiracao  DateTime?
+  dt_consulta_api           DateTime?
+  ds_status_consulta        StatusApi?               @default(ABERTO)
+  id_fis_empresas           String                   @unique
+  fis_empresas              fis_empresas             @relation(fields: [id_fis_empresas], references: [id])
+  fis_tecnospeed_process    fis_tecnospeed_process[]
+}
+
+model fis_tecnospeed_process {
+  id                         String                   @id @default(uuid())
+  dt_execucao                DateTime                 @default(now())
+  id_fis_empresas_tecnospeed String
+  ds_status                  String
+  ds_mensagem_geral          String?
+  requests                   fis_tecnospeed_request[] @relation("ProcessToRequests")
+  fis_empresas_tecnospeed    fis_empresas_tecnospeed  @relation(fields: [id_fis_empresas_tecnospeed], references: [id])
+}
+
+model fis_tecnospeed_request {
+  id                               String                            @id @default(uuid())
+  id_process                       String
+  id_fis_fornecedor                String?
+  ds_cidade_ibge                   String?
+  id_cidade_homologada             String?
+  fis_tecnospeed_cidade_homologada fis_tecnospeed_cidade_homologada? @relation(fields: [id_cidade_homologada], references: [id])
+  ds_protocolo                     String?
+  ds_erro                          String?
+  ds_body                          String?
+  ds_headers                       String?
+  vl_tentativas                    Int                               @default(0)
+  dt_created                       DateTime                          @default(now())
+  process                          fis_tecnospeed_process            @relation("ProcessToRequests", fields: [id_process], references: [id])
+  fornecedor                       fis_fornecedores?                 @relation(fields: [id_fis_fornecedor], references: [id])
+  fis_tecnospeed_raw               fis_tecnospeed_raw[]
+}
+
+model fis_tecnospeed_raw {
+  id         String                 @id @default(uuid())
+  id_request String
+  js_raw     Json
+  dt_fetched DateTime               @default(now())
+  pagina     Int
+  request    fis_tecnospeed_request @relation(fields: [id_request], references: [id])
+
+  fis_documento_dfe fis_documento_dfe[]
+}
+
+model fis_tecnospeed_cidade_homologada {
+  id                        String                   @id @default(uuid())
+  is_ativo                  Boolean                  @default(true)
+  ds_ibge_codigo            String                   @unique
+  ds_nome                   String
+  ds_padrao                 String?
+  fl_consultar_notas_tomada Boolean
+  fl_prestador_obrigatorio  Boolean
+  fl_precisa_certificado    Boolean
+  fl_paginar                Boolean
+  ds_tipo_comunicacao       String
+  fl_requer_login           Boolean
+  vl_timeout_ms             Int                      @default(30000)
+  vl_max_retries            Int                      @default(3)
+  fis_tecnospeed_request    fis_tecnospeed_request[]
+}
+
+model fis_documento_dfe {
+  id                         String              @id @default(uuid())
+  ds_raw                     String
+  ds_error                   String?
+  dt_created                 DateTime            @default(now())
+  dt_updated                 DateTime            @updatedAt
+  ds_tipo                    TipoDocumento?
+  ds_situacao_integracao     StatusExtracao?
+  ds_origem                  OrigemExtracao?
+  ds_status                  StatusFaturamento?  @default(PENDENTE)
+  ds_documento_destinatario  String?
+  ds_documento_emitente      String?
+  ds_documento_tomador       String?
+  ds_documento_remetente     String?
+  ds_documento_transportador String?
+  ds_documento_subcontratada String?
+  dt_emissao                 DateTime?
+  id_nfse                    String?
+  js_nfse                    fis_nfse?           @relation(fields: [id_nfse], references: [id])
+  id_nfe                     String?
+  js_nfe                     fis_nfe?            @relation(fields: [id_nfe], references: [id])
+  id_cte                     String?
+  js_cte                     fis_cte?            @relation(fields: [id_cte], references: [id])
+  id_fis_documento           String?             @unique
+  fis_documento              fis_documento?      @relation(fields: [id_fis_documento], references: [id])
+  id_protocolo_raw           String?
+  js_protocolo_raw           fis_tecnospeed_raw? @relation(fields: [id_protocolo_raw], references: [id])
+  ds_controle                Int?
+
+  fis_evento_dfe              fis_evento_dfe[]              @relation("DFEToRawEvents")
+  fis_documento_dfe_historico fis_documento_dfe_historico[] @relation("DFEToRawHistory")
+  fis_documento_origem        fis_documentos_relacionados[] @relation("DocumentoOrigem")
+  fis_documento_relacionado   fis_documentos_relacionados[] @relation("DocumentoReferenciado")
+
+  @@unique([id_nfse], name: "uniq_nfse_dfe")
+  @@unique([id_nfe], name: "uniq_nfe_dfe")
+  @@unique([id_cte], name: "uniq_cte_dfe")
+}
+
+/// Histórico de dados brutos (XML/JSON) de documento DFe
+/// Armazena todas as submissões posteriores à primeira (que fica em fis_documento_dfe.ds_raw)
+/// Útil para auditoria, reprocessamento e comparação de diferentes origens
+model fis_documento_dfe_historico {
+  id                   String            @id @default(uuid())
+  id_fis_documento_dfe String
+  fis_documento_dfe    fis_documento_dfe @relation("DFEToRawHistory", fields: [id_fis_documento_dfe], references: [id], onDelete: Cascade)
+  ds_raw               String // XML/JSON bruto da submissão
+  ds_origem            OrigemExtracao?
+  ds_error             String?
+  dt_received          DateTime          @default(now())
+
+  @@unique([ds_origem, id_fis_documento_dfe], name: "uniq_historico_por_origem")
+  @@index([id_fis_documento_dfe])
+  @@index([ds_origem])
+}
+
+/// Logs / histórico de integrações de documentos (NFe / NFSe / CTe / outros)
+model fis_integracao_documentos {
+  id         String   @id @default(uuid())
+  dt_created DateTime @default(now())
+  dt_updated DateTime @default(now()) @updatedAt
+
+  /// Empresa dona do registro (contexto)
+  id_fis_empresas String
+  fis_empresas    fis_empresas @relation(fields: [id_fis_empresas], references: [id])
+
+  /// Vínculos opcionais para facilitar correlação
+  id_fis_documento String?
+  fis_documento    fis_documento? @relation(fields: [id_fis_documento], references: [id])
+
+  id_fis_nfe String?
+  fis_nfe    fis_nfe? @relation(fields: [id_fis_nfe], references: [id])
+
+  id_fis_nfse String?
+  fis_nfse    fis_nfse? @relation(fields: [id_fis_nfse], references: [id])
+
+  id_fis_cte String?
+  fis_cte    fis_cte? @relation(fields: [id_fis_cte], references: [id])
+
+  /// Usuário que iniciou/acionou a integração (se aplicável)
+  id_profile  String?
+  sis_profile sis_profiles? @relation(fields: [id_profile], references: [id])
+
+  /// Ação e status do log
+  action IntegracaoAction
+  status IntegracaoStatus @default(PENDING)
+
+  /// Destino / sistema alvo (ex: ONVIO, DOMINIO, OUTRO)
+  ds_destination String?
+  /// ID de lote retornado pelo sistema externo (quando aplicável)
+  ds_lote_id     String?
+  /// Nome do arquivo enviado
+  ds_filename    String?
+
+  /// Conteúdo bruto enviado (XML / JSON) e resposta recebida
+  ds_raw      String? // armazenar raw do documento enviado
+  ds_response String? // resposta recebida do integrador
+
+  /// Número de tentativas e timestamps de envio
+  attempts    Int       @default(0)
+  dt_sent     DateTime?
+  dt_finished DateTime?
+
+  /// Dados extras estruturados
+  js_metadata Json?
+
+  @@index([id_fis_empresas])
+  @@index([status])
+}
+
+/// Ações possíveis para um registro de integração
+enum IntegracaoAction {
+  SEND
+  REVERT
+  OTHER
+}
+
+/// Status do processamento de integração
+enum IntegracaoStatus {
+  PENDING
+  SENT
+  SUCCESS
+  FAILED
+}
+
+model fis_evento_dfe {
+  id                      String             @id @default(uuid())
+  dt_created              DateTime           @default(now())
+  ds_raw                  String
+  ds_error                String?
+  ds_situacao_integracao  StatusExtracao?
+  ds_evento_id            String? // atributo Id do infEvento
+  ds_descricao_evento     String? // xEvento / descEvento
+  ds_chave_doc            String? // chNFe / chCTe / chNFSe
+  cd_codigo_evento        String? // tpEvento
+  ds_seq_evento           Int? // nSeqEvento / nPedRegEvento
+  dt_evento               DateTime? // dhEvento
+  ds_justificativa_evento String? // xMotivo / descEvento
+  ds_protocolo            String? // nProt
+  ds_status_retorno       String? // cStat + xMotivo do retEvento
+  id_fis_documento_dfe    String?
+  fis_documento_dfe       fis_documento_dfe? @relation("DFEToRawEvents", fields: [id_fis_documento_dfe], references: [id])
+  id_evento               String? // id do evento (infEvento/@Id)
+  fis_evento              fis_evento?        @relation(fields: [id_evento], references: [id])
+
+  @@unique([ds_evento_id, id_fis_documento_dfe], name: "uniq_raw_evento_por_dfe")
+  @@index([ds_chave_doc])
+  @@index([cd_codigo_evento])
+}
+
+model fis_evento {
+  id                      String           @id @default(uuid())
+  dt_created              DateTime         @default(now())
+  dt_updated              DateTime         @default(now()) @updatedAt
+  ds_evento_id            String // atributo Id do infEvento
+  ds_chave_doc            String?
+  ds_descricao_evento     String?
+  cd_codigo_evento        String?
+  ds_seq_evento           Int?
+  dt_evento               DateTime?
+  ds_justificativa_evento String?
+  ds_protocolo            String?
+  ds_status_retorno       String?
+  id_fis_documento        String
+  fis_documento           fis_documento    @relation(fields: [id_fis_documento], references: [id])
+  fis_evento_dfe          fis_evento_dfe[]
+
+  @@unique([ds_evento_id, id_fis_documento], name: "uniq_evento_por_documento")
+  @@index([id_fis_documento])
+  @@index([cd_codigo_evento])
+}
+
+// ---------------------- Regras Nfe ---------------------- //
+
+model fis_regras_entrada_nfe {
+  id                         String                                 @id @default(uuid())
+  dt_created                 DateTime                               @default(now())
+  dt_updated                 DateTime                               @updatedAt
+  ds_descricao               String
+  ds_origem_uf               String
+  ds_destino_uf              String
+  dt_vigencia                DateTime
+  js_origem_trib             fis_regras_entrada_nfe_origem_trib[]
+  js_tipos_produto           fis_regras_entrada_nfe_tipos_produto[]
+  js_ncm_produto             Json?
+  id_segmento_destinatario   String?
+  fis_segmentos              fis_segmentos_empresas?                @relation(fields: [id_segmento_destinatario], references: [id])
+  id_regime_destinatario     String?
+  sis_regime_tributario      sis_regimes_tributarios?               @relation(name: "RegimeTributarioDest", fields: [id_regime_destinatario], references: [id])
+  id_regime_emitente         String?
+  sis_regime_tributario_emit sis_regimes_tributarios?               @relation(name: "RegimeTributarioEmit", fields: [id_regime_emitente], references: [id])
+  js_cfop_origem             fis_regras_entrada_nfe_cfop_origem[]
+  js_cst_origem              fis_regras_entrada_nfe_cst_origem[]
+  id_cfop_entrada            String?
+  sis_cfop_entrada           sis_cfop?                              @relation("CfopEntrada", fields: [id_cfop_entrada], references: [id])
+  id_cst_entrada             String?
+  sis_cst_entrada            sis_cst?                               @relation("CstEntrada", fields: [id_cst_entrada], references: [id])
+  id_cfop_gerado             String?
+  sis_cfop_gerado            sis_cfop?                              @relation("CfopGerado", fields: [id_cfop_gerado], references: [id])
+  id_cst_gerado              String?
+  sis_cst_gerado             sis_cst?                               @relation("CstGerado", fields: [id_cst_gerado], references: [id])
+  id_empresa                 String
+  fis_empresas               fis_empresas?                          @relation(fields: [id_empresa], references: [id])
+
+  fis_nfe_itens_alter fis_nfe_itens_alter_entrada[]
+}
+
+model fis_regras_entrada_nfe_cst_origem {
+  id                        String                 @id @default(uuid())
+  id_fis_regras_entrada_nfe String
+  id_sis_cst                String
+  fis_regras_entrada_nfe    fis_regras_entrada_nfe @relation(fields: [id_fis_regras_entrada_nfe], references: [id], onDelete: Cascade)
+  sis_cst                   sis_cst                @relation(fields: [id_sis_cst], references: [id])
+
+  @@unique([id_fis_regras_entrada_nfe, id_sis_cst])
+}
+
+model fis_regras_entrada_nfe_cfop_origem {
+  id                        String                 @id @default(uuid())
+  id_fis_regras_entrada_nfe String
+  id_cfop                   String
+  fis_regras_entrada_nfe    fis_regras_entrada_nfe @relation(fields: [id_fis_regras_entrada_nfe], references: [id], onDelete: Cascade)
+  sis_cfop                  sis_cfop               @relation(fields: [id_cfop], references: [id])
+
+  @@unique([id_fis_regras_entrada_nfe, id_cfop])
+}
+
+model fis_regras_entrada_nfe_tipos_produto {
+  id                        String                 @id @default(uuid())
+  id_fis_regras_entrada_nfe String
+  id_sis_tipos_produto      String
+  fis_regras_entrada_nfe    fis_regras_entrada_nfe @relation(fields: [id_fis_regras_entrada_nfe], references: [id], onDelete: Cascade)
+  sis_tipos_produto         sis_tipos_produto      @relation(fields: [id_sis_tipos_produto], references: [id])
+
+  @@unique([id_fis_regras_entrada_nfe, id_sis_tipos_produto])
+}
+
+model fis_regras_entrada_nfe_origem_trib {
+  id                        String                 @id @default(uuid())
+  id_fis_regras_entrada_nfe String
+  id_sis_origem_cst         String
+  fis_regras_entrada_nfe    fis_regras_entrada_nfe @relation(fields: [id_fis_regras_entrada_nfe], references: [id], onDelete: Cascade)
+  sis_origem_cst            sis_origem_cst         @relation(fields: [id_sis_origem_cst], references: [id])
+
+  @@unique([id_fis_regras_entrada_nfe, id_sis_origem_cst])
+}
+
+enum TipoDocumento {
+  NFSE
+  CTE
+  NFE
+  CFE
+  NFCE
+}
+
+enum StatusProduto {
+  ATIVO
+  INATIVO
+  NOVO
+}
+
+enum StatusDocumento {
+  DIGITADO
+  IMPORTADO
+  EM_AUTENTICACAO
+  EMITIDO
+  AGUARDANDO_VALIDACAO
+  AGUARDANDO_INTEGRACAO
+  DIGITADO_EMPRESA
+  RECEBIDO_EMPRESA
+  INTEGRACAO_ESCRITA
+  DIGITADO_FISCAL
+  CONFERIDO_FISCAL
+  ANULADO
+  CANCELADO
+  NAO_PROCESSADO
+  PROCESSADO
+  EM_PROCESSAMENTO
+  OPERACAO_NAO_REALIZADA
+  DESCONHECIMENTO_DA_OPERACAO
+}
+
+enum StatusFaturamento {
+  PENDENTE
+  VINCULADO
+  PROCESSADO
+  CANCELADO
+  ARQUIVADO
+}
+
+enum StatusFornecedor {
+  NOVO
+  ATIVO
+  INATIVO
+}
+
+enum NfseOrigem {
+  PREFEITURA
+  ESTEIRA
+  DOMINIO
+  XML
+}
+
+enum OrigemExtracao {
+  DFE_SIEG
+  DFE_TECNOSPEED_TOMADOS
+  API_IMPORTACAO_XML
+  API_EMAIL
+}
+
+enum StatusExtracao {
+  ERRO
+  IMPORTADO
+  INTEGRADO
+}
+
+enum TipoEf {
+  ENTRADA
+  SAIDA
+  TOMADO
+}
+
+enum StatusApi {
+  ABERTO
+  ERRO
+  ENVIO
+  COLETA
+  CONCLUIDO
+}
+
+enum SatConferenciaStatus {
+  RECEBIDO
+  PROCESSANDO
+  CONCLUIDO
+  ERRO
+}
+
+enum SatConferenciaItemStatus {
+  ACHADO
+  NAO_ENCONTRADO
+  MULTIPLOS
+  ERRO
+}
+
+model fis_sat_conferencia {
+  id              String               @id @default(uuid())
+  dt_created      DateTime             @default(now())
+  dt_updated      DateTime             @default(now()) @updatedAt
+  id_fis_empresas String?
+  id_user         String?
+  sis_profiles    sis_profiles?        @relation(fields: [id_user], references: [id])
+  ds_filename     String?
+  cd_file_hash    String?
+  ds_status       SatConferenciaStatus @default(RECEBIDO)
+  vl_rows_total   Int?                 @default(0)
+  vl_errors_count Int?                 @default(0)
+  ds_conteudo     Json?
+  ds_message      Json?
+
+  items fis_sat_conferencia_item[]
+
+  @@index([id_fis_empresas])
+}
+
+model fis_sat_conferencia_item {
+  id               String                    @id @default(uuid())
+  id_conferencia   String
+  ds_numero_row    Int
+  id_fis_documento String?
+  fis_documento    fis_documento?            @relation(fields: [id_fis_documento], references: [id])
+  ds_status        SatConferenciaItemStatus?
+  ds_message       String?
+  dt_created       DateTime                  @default(now())
+
+  conferencia fis_sat_conferencia @relation(fields: [id_conferencia], references: [id])
+
+  @@index([id_conferencia])
+}
+
+model fis_auditoria_doc {
+  id                 String        @id @default(uuid())
+  dt_created         DateTime      @default(now())
+  dt_updated         DateTime      @default(now()) @updatedAt
+  id_fis_documento   String
+  fis_documento      fis_documento @relation(fields: [id_fis_documento], references: [id])
+  ds_tipo_doc        TipoDocumento
+  js_inconsistencias Json
+  id_nfe             String?
+  fis_nfe            fis_nfe?      @relation(fields: [id_nfe], references: [id])
+  id_nfse            String?
+  fis_nfse           fis_nfse?     @relation(fields: [id_nfse], references: [id])
+  id_cte             String?
+  fis_cte            fis_cte?      @relation(fields: [id_cte], references: [id])
+}
+
+// Dicionário de tipos de inconsistência (regras)
+model fis_tipo_inconsistencia {
+  id                 String           @id @default(uuid())
+  dt_created         DateTime         @default(now())
+  dt_updated         DateTime         @default(now()) @updatedAt
+  cd_codigo          String           @unique
+  ds_descricao       String
+  criticidade_padrao CriticidadeLevel @map("criticidade_padrao")
+  ds_grupo           String?
+  fl_ativo           Boolean          @default(true)
+  ds_ordem_exibicao  Int?             @default(0)
+  versao_regra       String?
+  dt_inicio_vigencia DateTime?
+  dt_fim_vigencia    DateTime?
+
+  @@map("fis_tipo_inconsistencia")
+}
+
+enum CriticidadeLevel {
+  INFO
+  AVISO
+  CRITICA
+}
+
+enum StatusAlteracaoSubcontratacao {
+  PENDENTE
+  APROVADO
+  REJEITADO
+  REVERTIDO
+}

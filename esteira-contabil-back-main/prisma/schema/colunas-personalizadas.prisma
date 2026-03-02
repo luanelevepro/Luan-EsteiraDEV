@@ -1,0 +1,44 @@
+// Colunas personalizadas por empresa (definição + dados por registro)
+
+enum TipoColunas {
+  DATA
+  TEXTO
+  OPCAO
+}
+
+enum TabelasPersonalizadas {
+  CARGASLIST
+  ENTREGASLIST
+  VIAGENSLIST
+}
+
+model sis_colunas_personalizadas {
+  id             String                @id @default(uuid())
+  dt_created     DateTime              @default(now())
+  dt_updated     DateTime              @default(now()) @updatedAt
+  ds_nome_coluna String
+  ds_descricao   String?
+  ds_tipo        TipoColunas
+  js_valores     Json?
+  ds_tabela      TabelasPersonalizadas
+  id_sis_empresa String
+  nr_ordem       Int                   @default(0)
+  sis_empresas   sis_empresas          @relation(fields: [id_sis_empresa], references: [id], onDelete: Cascade)
+  sisColunaDados sis_coluna_dado[]
+
+  @@unique([id_sis_empresa, ds_tabela, ds_nome_coluna])
+  @@index([id_sis_empresa, ds_tabela])
+}
+
+model sis_coluna_dado {
+  id                            String                     @id @default(uuid())
+  dt_created                    DateTime                   @default(now())
+  dt_updated                    DateTime                   @default(now()) @updatedAt
+  id_sis_colunas_personalizadas String
+  sis_colunas_personalizadas    sis_colunas_personalizadas @relation(fields: [id_sis_colunas_personalizadas], references: [id], onDelete: Cascade)
+  id_referencia                 String
+  ds_valor                      String
+
+  @@unique([id_sis_colunas_personalizadas, id_referencia])
+  @@index([id_sis_colunas_personalizadas, id_referencia])
+}

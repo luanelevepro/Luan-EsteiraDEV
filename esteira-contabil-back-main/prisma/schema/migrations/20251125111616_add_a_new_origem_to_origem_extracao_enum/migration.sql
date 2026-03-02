@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "OrigemExtracao" ADD VALUE 'API_IMPORTACAO_XML';

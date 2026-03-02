@@ -1,0 +1,146 @@
+enum EMB_INSUMO_UNIDADE_MEDIDA {
+  LITROS
+  METROS
+  UNIDADE
+  QUILOS
+  TONELADAS
+  GRAMAS
+  MILILITROS
+  CENTIMETROS
+}
+
+model emb_tipos_insumo {
+  id        String @id @default(uuid())
+  ds_insumo String
+
+  id_emb_empresas String
+  js_emb_empresas emb_empresas @relation(fields: [id_emb_empresas], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  emb_insumos emb_insumos[]
+
+  @@unique([ds_insumo, id_emb_empresas])
+}
+
+model emb_insumos {
+  id                String                    @id @default(uuid())
+  cd_insumo         String
+  ds_insumo         String                    @db.VarChar(50)
+  ds_unidade_medida EMB_INSUMO_UNIDADE_MEDIDA
+
+  id_emb_empresas String
+  js_emb_empresas emb_empresas @relation(fields: [id_emb_empresas], references: [id])
+
+  id_tipo_insumo            String
+  js_tipo_insumo            emb_tipos_insumo    @relation(fields: [id_tipo_insumo], references: [id])
+  tipos_veiculo_combustivel emb_tipos_veiculo[] @relation("emb_tipo_veiculo_combustivel")
+  tipos_veiculo_pneu        emb_tipos_veiculo[] @relation("emb_tipo_veiculo_pneu")
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  emb_tipos_veiculo emb_tipos_veiculo[] @relation("emb_tipo_veiculo_insumos")
+
+  emb_vigencia_insumos_estabelecimento emb_vigencia_insumos_estabelecimento[]
+
+  @@unique([cd_insumo, id_emb_empresas])
+}
+
+model emb_vigencia_insumos_estabelecimento {
+  id                 String    @id @default(uuid())
+  dt_vigencia        DateTime?
+  id_estabelecimento Int?
+  cd_segmento_id     String?
+  cd_fornecedor_id   String?
+  vl_valor           Decimal?  @db.Decimal(10, 2)
+  dt_created_at      DateTime  @default(now())
+  dt_updated_at      DateTime  @updatedAt
+
+  // Relationships
+  id_emb_insumo String
+  js_insumo     emb_insumos @relation(fields: [id_emb_insumo], references: [id])
+}
+
+model emb_fornecedores_insumos {
+  id              String       @id @default(uuid())
+  cd_fornecedor   String
+  ds_nome         String
+  id_emb_empresas String
+  js_emb_empresas emb_empresas @relation(fields: [id_emb_empresas], references: [id])
+
+  dt_createdAt DateTime @default(now())
+  dt_updatedAt DateTime @updatedAt()
+
+  @@unique([cd_fornecedor, id_emb_empresas])
+}
+
+model emb_postos_coleta {
+  id               String        @id @default(uuid())
+  cd_posto         Int
+  ds_cnpj          String        @db.VarChar(255)
+  ds_razao_social  String        @db.VarChar(255)
+  ds_nome_fantasia String        @db.VarChar(255)
+  ds_logradouro    String        @db.VarChar(255)
+  ds_bairro        String        @db.VarChar(255)
+  id_cidade        Int
+  js_cidade        sis_igbe_city @relation(fields: [id_cidade], references: [id])
+  dt_created_at    DateTime      @default(now())
+  dt_updated_at    DateTime      @updatedAt
+
+  emb_dados_coleta_postos emb_dados_coleta_postos[]
+}
+
+model emb_dados_coleta_postos {
+  id             String             @id @default(uuid())
+  id_posto       String?
+  js_posto       emb_postos_coleta? @relation(fields: [id_posto], references: [id])
+  dt_coleta      DateTime
+  vl_valor       Decimal            @db.Decimal(6, 2)
+  ds_combustivel String             @db.VarChar(255)
+}
+
+model emb_combustivel_municipio {
+  id             String        @id @default(uuid())
+  ds_combustivel String        @db.VarChar(255)
+  id_municipio   Int
+  js_municipio   sis_igbe_city @relation(fields: [id_municipio], references: [id])
+  vl_valor       Decimal       @db.Decimal(6, 2)
+  dt_vigencia    DateTime
+
+  @@unique([ds_combustivel, id_municipio, dt_vigencia])
+}
+
+model emb_combustivel_microregiao {
+  id             String           @id @default(uuid())
+  ds_combustivel String           @db.VarChar(255)
+  id_microregiao Int
+  js_microregiao sis_microregions @relation(fields: [id_microregiao], references: [id])
+  vl_valor       Decimal          @db.Decimal(6, 2)
+  dt_vigencia    DateTime
+
+  @@unique([ds_combustivel, id_microregiao, dt_vigencia])
+}
+
+model emb_combustivel_mesorregiao {
+  id             String          @id @default(uuid())
+  ds_combustivel String          @db.VarChar(255)
+  id_mesorregiao Int
+  js_mesorregiao sis_mesoregions @relation(fields: [id_mesorregiao], references: [id])
+  vl_valor       Decimal         @db.Decimal(6, 2)
+  dt_vigencia    DateTime
+
+  @@unique([ds_combustivel, id_mesorregiao, dt_vigencia])
+}
+
+model emb_combustivel_estado {
+  id             String      @id @default(uuid())
+  ds_combustivel String      @db.VarChar(255)
+  id_estado      Int
+  js_estado      sis_ibge_uf @relation(fields: [id_estado], references: [id])
+  vl_valor       Decimal     @db.Decimal(6, 2)
+  dt_vigencia    DateTime
+
+  @@unique([ds_combustivel, id_estado, dt_vigencia])
+}

@@ -1,0 +1,1 @@
+-- baseline: no-op; database already has the target schema

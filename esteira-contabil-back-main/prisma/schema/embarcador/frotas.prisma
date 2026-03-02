@@ -1,0 +1,372 @@
+// On legacy: tipo_veiculo_empresa
+model emb_tipos_veiculo {
+  id         String @id @default(uuid())
+  cd_veiculo String
+  ds_veiculo String @db.VarChar(35)
+
+  vc_quantidade_pneus               Int     @default(4)
+  vl_quantidade_carrocerias         String? @db.VarChar(1)
+  vl_quantidade_eixos_tracionadores Int     @default(1)
+
+  // Estrutura:
+  // eixo_<number>: <rodagem dupla (1)> <rodagem simples (2)>
+  // uma entrada para cada eixo
+  js_composicao_eixo_tracionador Json
+
+  id_emb_insumo_pneu                       String?                                 @map("id_insumo_pneu")
+  js_emb_insumo_pneu                       emb_insumos?                            @relation("emb_tipo_veiculo_pneu", fields: [id_emb_insumo_pneu], references: [id])
+  id_emb_insumo_combustivel                String?
+  js_emb_insumo_combustivel                emb_insumos?                            @relation("emb_tipo_veiculo_combustivel", fields: [id_emb_insumo_combustivel], references: [id])
+  id_emb_empresas                          String
+  js_emb_empresas                          emb_empresas                            @relation(fields: [id_emb_empresas], references: [id])
+  js_emb_insumos                           emb_insumos[]                           @relation("emb_tipo_veiculo_insumos")
+  js_emb_orcamentos_carroceria_semireboque emb_orcamentos_carroceria_semireboque[]
+  js_emb_combinacao_carroceria_orcamento   emb_combinacao_carroceria_orcamento[]
+  js_emb_combinacao_carroceria_historico   emb_combinacao_carroceria_historico[]
+  js_emb_frota                             emb_frota[]
+  id_emb_classificacao_veiculos            String
+  js_emb_classificacao_veiculos            emb_classificacao_veiculos              @relation(fields: [id_emb_classificacao_veiculos], references: [id])
+
+  dt_created                    DateTime                        @default(now())
+  dt_updated                    DateTime                        @updatedAt
+  // emb_frota_vigencia emb_frota_vigencia[] @relation("FrotaVigencia")
+  emb_frota_reposicao           emb_frota_reposicao[]
+  emb_frota_vigencia            emb_frota_vigencia[]            @relation("TipoVeiculoFrotaVigencia")
+  sis_tabela_fipe               sis_tabela_fipe[]
+  sis_fipe_historico            sis_fipe_historico[]
+  emb_parametros_apuracao_carga emb_parametros_apuracao_carga[]
+  emb_custo_variavel_vigencia   emb_custo_variavel_vigencia[]
+  emb_custo_fixo_vigencia       emb_custo_fixo_vigencia[]
+
+  @@unique([cd_veiculo, id_emb_empresas])
+}
+
+// On Legacy: tipo_carroceria_empresa
+model emb_tipos_carroceria {
+  id                  String @id @default(uuid())
+  cd_carroceria       String
+  ds_carroceria       String
+  vl_quantidade_eixos Int
+  // Estrutura:
+  // eixo_<number>: <rodagem dupla (1)> <rodagem simples (2)>
+  // uma entrada para cada eixo
+  js_composicao_eixo  Json
+  vc_quantidade_pneus Int
+
+  id_emb_classificacao_carrocerias      String
+  js_emb_classificacao_carrocerias      emb_classificacao_carrocerias           @relation(fields: [id_emb_classificacao_carrocerias], references: [id])
+  id_emb_empresas                       String
+  js_emb_empresas                       emb_empresas                            @relation(fields: [id_emb_empresas], references: [id])
+  emb_orcamentos_carroceria_semireboque emb_orcamentos_carroceria_semireboque[]
+  emb_combinacao_carroceria_orcamento   emb_combinacao_carroceria_orcamento[]
+  emb_combinacao_carroceria_historico   emb_combinacao_carroceria_historico[]
+
+  js_emb_frotas   emb_frota[]
+  js_emb_frotas_2 emb_frota[] @relation("Carroceria2")
+
+  dt_created DateTime @default(now())
+  dt_updated DateTime @updatedAt
+
+  @@unique([cd_carroceria, id_emb_empresas])
+}
+
+// On legacy: caracteristica_carroceria
+model emb_caracteristicas_carroceria {
+  id                String @id @default(uuid())
+  cd_caracteristica String @db.VarChar(10)
+  ds_caracteristica String @db.VarChar(50)
+
+  id_emb_empresas                       String
+  emb_empresas                          emb_empresas                            @relation(fields: [id_emb_empresas], references: [id])
+  emb_orcamentos_carroceria_semireboque emb_orcamentos_carroceria_semireboque[]
+
+  dt_created                  DateTime                      @default(now())
+  dt_updated                  DateTime                      @updatedAt
+  js_emb_frotas               emb_frota[]
+  js_emb_frotas_2             emb_frota[]                   @relation("Carroceria2Caracteristica")
+  emb_custo_variavel_vigencia emb_custo_variavel_vigencia[]
+  emb_custo_fixo_vigencia     emb_custo_fixo_vigencia[]
+
+  @@unique([cd_caracteristica, id_emb_empresas])
+}
+
+model emb_marcas_carroceria {
+  id       String @id @default(uuid())
+  cd_marca String @db.VarChar(10)
+  ds_marca String @db.VarChar(25)
+
+  id_emb_empresas String
+  emb_empresas    emb_empresas @relation(fields: [id_emb_empresas], references: [id])
+
+  dt_created     DateTime    @default(now())
+  dt_updated     DateTime    @updatedAt
+  js_emb_frotas  emb_frota[]
+  js_emb_frota_2 emb_frota[] @relation("Carroceria2Marca")
+
+  // Opposite relation for emb_frota.js_carroceria2_marca
+  emb_frota emb_frota[] @relation("CarroceriaMarca")
+
+  @@unique([cd_marca, id_emb_empresas])
+}
+
+model emb_tipos_porte_carroceria_semireboque {
+  id       String @id @default(uuid())
+  cd_porte String @db.VarChar(10)
+  ds_porte String @db.VarChar(50)
+
+  id_emb_empresas String
+  emb_empresas    emb_empresas @relation(fields: [id_emb_empresas], references: [id])
+
+  dt_created     DateTime    @default(now())
+  dt_updated     DateTime    @updatedAt
+  js_emb_frota   emb_frota[]
+  js_emb_frota_2 emb_frota[] @relation("Carroceria2Porte")
+
+  @@unique([cd_porte, id_emb_empresas])
+}
+
+model emb_orcamentos_carroceria_semireboque {
+  id                               String                         @id @default(uuid())
+  id_emb_empresas                  String
+  js_emb_empresas                  emb_empresas                   @relation(fields: [id_emb_empresas], references: [id])
+  id_emb_tipo_veiculo              String
+  js_emb_tipo_veiculo              emb_tipos_veiculo              @relation(fields: [id_emb_tipo_veiculo], references: [id])
+  id_emb_tipo_carroceria           String
+  js_emb_tipo_carroceria           emb_tipos_carroceria           @relation(fields: [id_emb_tipo_carroceria], references: [id])
+  id_emb_caracteristica_carroceria String
+  js_emb_caracteristica_carroceria emb_caracteristicas_carroceria @relation(fields: [id_emb_caracteristica_carroceria], references: [id])
+
+  @@unique([id_emb_empresas, id_emb_tipo_veiculo, id_emb_tipo_carroceria, id_emb_caracteristica_carroceria])
+}
+
+model emb_combinacao_carroceria_orcamento {
+  id String @id @default(uuid())
+
+  id_emb_tipo_carroceria String
+  js_emb_tipo_carroceria emb_tipos_carroceria @relation(fields: [id_emb_tipo_carroceria], references: [id])
+  id_emb_tipo_veiculo    String
+  js_emb_tipo_veiculo    emb_tipos_veiculo    @relation(fields: [id_emb_tipo_veiculo], references: [id])
+  // Estrutura:
+  // valores: [<implement_id>]
+  // Um ID para cada implemento, array único.
+  js_implemento          Json?
+
+  dt_created DateTime @default(now())
+  dt_updated DateTime @updatedAt
+
+  emb_implementos_historico emb_implementos_historico[]
+}
+
+model emb_combinacao_carroceria_historico {
+  id String @id @default(uuid())
+
+  id_emb_tipo_carroceria String
+  js_emb_tipo_carroceria emb_tipos_carroceria @relation(fields: [id_emb_tipo_carroceria], references: [id])
+  id_emb_tipo_veiculo    String
+  js_emb_tipo_veiculo    emb_tipos_veiculo    @relation(fields: [id_emb_tipo_veiculo], references: [id])
+  // Estrutura:
+  // valores: [<implement_id>]
+  // Um ID para cada implemento, array único.
+  js_implemento          Json?
+
+  dt_created DateTime @default(now())
+  dt_updated DateTime @updatedAt
+}
+
+model emb_implementos {
+  id            String @id @default(uuid())
+  cd_implemento String @unique @db.VarChar(10)
+  ds_implemento String @db.VarChar(50)
+
+  id_classificacao_implemento     String
+  js_emb_classificacao_implemento emb_classificacao_implementos @relation(fields: [id_classificacao_implemento], references: [id])
+  id_emb_empresas                 String
+  js_emb_empresas                 emb_empresas                  @relation(fields: [id_emb_empresas], references: [id])
+
+  // Valor opcional baseados no tipo de implementos
+  // Se o implento possui eixo(s) adidicional(is)
+  // Precisamos incluir os eixos adicionais no cálculo do valor do implemento
+  // Ex: Implemento do tipo: Equipamento
+  // Equipamento não possui eixo adicional. Portanto (2)
+  // Selecionamos rodagem simples em ambos os eixos.
+  // vl_quantidade_pneus_adicional = 4
+  vl_quantidade_eixos_adicional Int?
+  vl_quantidade_pneus           Int
+
+  // Estrutura:
+  // eixo_<number>: <rodagem dupla (1)> <rodagem simples (2)>
+  // uma entrada para cada eixo
+  js_composicao_eixo Json
+
+  fl_ativo Boolean? @default(true)
+
+  dt_created DateTime @default(now())
+  dt_updated DateTime @updatedAt
+}
+
+model emb_implementos_historico {
+  id      String  @id @default(uuid())
+  vl_ano  Int
+  vl_soma Decimal @db.Money()
+
+  id_emb_empresas             String
+  emb_empresas                emb_empresas                        @relation(fields: [id_emb_empresas], references: [id])
+  id_emb_combinacao_orcamento String
+  js_emb_combinacao_orcamento emb_combinacao_carroceria_orcamento @relation(fields: [id_emb_combinacao_orcamento], references: [id])
+}
+
+// On legacy: frota
+model emb_frota {
+  id                     String               @id @default(uuid())
+  cd_frota               String
+  id_emb_ibge_uf         Int
+  js_emb_ibge_uf         emb_ibge_uf          @relation(fields: [id_emb_ibge_uf], references: [id])
+  id_emb_ibge_cidade     Int
+  js_emb_ibge_cidade     emb_ibge_cidades     @relation(fields: [id_emb_ibge_cidade], references: [id])
+  vl_qtde_motoristas     Int?
+  vl_qtde_ajudantes      Int?
+  id_estabelecimento     String
+  js_emb_estabelecimento emb_estabelecimentos @relation(fields: [id_estabelecimento], references: [id])
+  cd_transportador       String
+  js_emb_transportadora  emb_transportadoras  @relation(fields: [cd_transportador], references: [cd_transportadora])
+
+  // Max de 2, aparentemente
+  vc_quantidade_carrocerias Int      @default(1)
+  fl_status                 Boolean? @default(false)
+  ds_situacao               String?
+
+  vl_valor_frota       Float?
+  vl_valor_implementos Float?
+  vl_valor_carrocerias Float?
+  vl_valor_fipe        Float?
+
+  id_emb_empresas String
+  js_emb_empresas emb_empresas @relation(fields: [id_emb_empresas], references: [id])
+
+  /**
+   * ****************************************************************************
+   * Tracionador                                 *
+   * ****************************************************************************
+   */
+
+  // Format: [<implement_id>]
+  // Um ID para cada implemento, array único.
+  js_trac_implemento                   Json?
+  ds_placa_tracionador                 String
+  id_emb_marcas_carroceria_tracionador String
+  js_emb_marca_tracionador             emb_marcas_carroceria? @relation(fields: [id_emb_marcas_carroceria_tracionador], references: [id])
+  ds_modelo_tracionador                String
+  vl_ano_modelo_tracionador            Int
+  cd_fipe_tracionador                  String
+  id_tabela_fipe                       String?
+  js_emb_fipe_tracionador              sis_tabela_fipe?       @relation(fields: [id_tabela_fipe], references: [id])
+  dt_compra_tracionador                DateTime?
+  id_emb_tipos_veiculo_tracionador     String
+  js_emb_tipos_veiculo_tracionador     emb_tipos_veiculo      @relation(fields: [id_emb_tipos_veiculo_tracionador], references: [id])
+
+  /**
+   * ****************************************************************************
+   * Semi-Reboques                                *
+   * ****************************************************************************
+   */
+
+  //
+  // Semi-reboque 1 --------------------------------------------------------------
+  //
+  ds_placa_carroceria_semi               String?
+  cd_fipe_carroceria_semi                String?
+  id_tabela_fipe_carroceria_semi         String?
+  js_emb_fipe_carroceria_semi            sis_tabela_fipe? @relation(name: "CarroceriaFIPE", fields: [id_tabela_fipe_carroceria_semi], references: [id])
+  id_emb_tipos_carroceria_semi           String?
+  // Configurações da FIPE:
+  id_emb_marcas_carroceria_semi          String?
+  id_emb_caracteristicas_carroceria_semi String?
+  id_emb_portes_carroceria_semi          String?
+  // Format: [<implement_id>]
+  // Um ID para cada implemento, array único.
+  js_implemento_carroceria_semi          Json?
+
+  js_emb_tipo_carroceria_semi           emb_tipos_carroceria?                   @relation(fields: [id_emb_tipos_carroceria_semi], references: [id])
+  js_emb_marca_carroceria_semi          emb_marcas_carroceria?                  @relation("CarroceriaMarca", fields: [id_emb_marcas_carroceria_semi], references: [id])
+  js_emb_caracteristica_carroceria_semi emb_caracteristicas_carroceria?         @relation(fields: [id_emb_caracteristicas_carroceria_semi], references: [id])
+  js_emb_porte_carroceria_semi          emb_tipos_porte_carroceria_semireboque? @relation(fields: [id_emb_portes_carroceria_semi], references: [id])
+  ds_modelo_carroceria_semi             String?
+  vl_ano_modelo_carroceria_semi         Int?
+
+  //
+  // Semi-reboque 2 --------------------------------------------------------------
+  //
+  ds_placa_carroceria_semi_2               String?
+  cd_fipe_carroceria_semi_2                String?
+  id_tabela_fipe_carroceria_semi_2         String?
+  js_emb_fipe_carroceria_semi_2            sis_tabela_fipe? @relation(name: "Carroceria2FIPE", fields: [id_tabela_fipe_carroceria_semi_2], references: [id])
+  id_emb_tipos_carroceria_semi_2           String?
+  id_emb_marcas_carroceria_semi_2          String?
+  id_emb_caracteristicas_carroceria_semi_2 String?
+  id_emb_portes_carroceria_semi_2          String?
+  // Format: [<implement_id>]
+  // Um ID para cada implemento, array único.
+  js_implementos_carroceria_semi_2         Json?
+
+  js_emb_tipo_carroceria_semi_2           emb_tipos_carroceria?                   @relation("Carroceria2", fields: [id_emb_tipos_carroceria_semi_2], references: [id])
+  js_emb_marca_carroceria_semi_2          emb_marcas_carroceria?                  @relation("Carroceria2Marca", fields: [id_emb_marcas_carroceria_semi_2], references: [id])
+  js_emb_caracteristica_carroceria_semi_2 emb_caracteristicas_carroceria?         @relation("Carroceria2Caracteristica", fields: [id_emb_caracteristicas_carroceria_semi_2], references: [id])
+  js_emb_porte_carroceria_semi_2          emb_tipos_porte_carroceria_semireboque? @relation("Carroceria2Porte", fields: [id_emb_portes_carroceria_semi_2], references: [id])
+  ds_modelo_carroceria_semi_2             String?
+  vl_ano_modelo_carroceria_semi_2         Int?
+
+  dt_created_at      DateTime             @default(now())
+  dt_updated_at      DateTime             @updatedAt
+  emb_frota_vigencia emb_frota_vigencia[] @relation("FrotaVigencia")
+  // apuracao_cargas_dados apuracao_cargas_dados[]
+
+  @@unique([cd_frota, id_emb_empresas])
+}
+
+// On legacy: frota_vigencia
+model emb_frota_vigencia {
+  id          String   @id @default(uuid())
+  dt_vigencia DateTime @db.Date
+
+  vl_quantidade_motoristas Decimal? @db.Decimal(8, 3)
+  vl_quantidade_ajudantes  Decimal? @db.Decimal(8, 3)
+
+  fl_status String?
+
+  id_emb_estabelecimento String
+  js_emb_estabelecimento emb_estabelecimentos @relation(fields: [id_emb_estabelecimento], references: [id])
+
+  cd_transportadora     String
+  js_emb_transportadora emb_transportadoras @relation(fields: [cd_transportadora], references: [cd_transportadora])
+
+  id_emb_tipos_veiculo String
+  js_emb_tipos_veiculo emb_tipos_veiculo @relation("TipoVeiculoFrotaVigencia", fields: [id_emb_tipos_veiculo], references: [id])
+
+  id_emb_frota String
+  js_emb_frota emb_frota @relation("FrotaVigencia", fields: [id_emb_frota], references: [id])
+
+  dt_created DateTime @default(now())
+  dt_updated DateTime @updatedAt
+
+  @@unique([dt_vigencia, id_emb_frota])
+}
+
+model emb_frota_reposicao {
+  id                    String              @id @default(uuid())
+  id_emg_segmento_carga String?
+  js_emb_segmento_carga emb_segmento_carga? @relation(fields: [id_emg_segmento_carga], references: [id])
+  id_emb_tabela_fipe    String
+  js_emb_fipe           sis_tabela_fipe     @relation(fields: [id_emb_tabela_fipe], references: [id])
+  // Isso aqui (ds_modelo, ds_marca) vem da tabela fipe.
+  // é preenchida no front-end com todos os modelos disponíveis na lista da tabela FIPE e então exibidos num select.
+  // O certo seria termos uma tabela para modelos, assim como temos para marcas. -> DEV 2 concorda.
+  // Mas o francisco quer gohorse.
+  ds_modelo             String
+  ds_marca              String
+  vl_ano_modelo         String
+  //
+  id_emb_empresas       String
+  js_emb_empresas       emb_empresas        @relation(fields: [id_emb_empresas], references: [id])
+  id_emb_tipo_veiculo   String
+  js_emb_tipo_veiculo   emb_tipos_veiculo   @relation(fields: [id_emb_tipo_veiculo], references: [id])
+}

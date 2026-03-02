@@ -1,0 +1,22 @@
+model rtc_produtos_classificacao {
+  id                    String       @id @default(uuid())
+  dt_created            DateTime     @default(now())
+  dt_updated            DateTime     @default(now()) @updatedAt
+  id_fis_produtos       String       @unique
+  fis_produtos          fis_produtos @relation(fields: [id_fis_produtos], references: [id], onDelete: Cascade)
+  cd_ncm_normalizado    String? // NCM sem pontos (ex: 24021000)
+  cd_cst                String       @default("000")
+  cd_class_trib         String       @default("000001")
+  ds_class_trib_descr   String? // Descrição da classificação
+  ds_tipo_aliquota      String?
+  ds_anexo_numero       String?
+  ds_anexo_descricao    String?
+  ds_anexo_numero_item  String?
+  ds_anexo_texto_item   String? // ANXO_TEXTO_ITEM - texto/descrição real do item no anexo
+  fl_ncm_encontrado     Boolean      @default(false) // Se foi encontrado no calculadora.db
+  fl_confirmado_usuario Boolean      @default(false) // Flag de confirmação por usuário
+  vl_reducao_cbs        Decimal? // Percentual de redução CBS (0-100)
+  vl_reducao_ibs_uf     Decimal? // Percentual de redução IBS UF
+  vl_reducao_ibs_mun    Decimal? // Percentual de redução IBS Município
+  ds_tipo_reducao       String? // Tipo derivado (ex: REDUCAO_60, ALIQUOTA_ZERO, CBS_ZERO_IBS_60, MISTA/OUTRA)
+}

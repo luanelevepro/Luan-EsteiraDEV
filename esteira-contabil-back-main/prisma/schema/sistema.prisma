@@ -1,0 +1,498 @@
+model sis_profiles {
+  id                        String                      @id @default(uuid())
+  dt_created                DateTime?                   @default(now())
+  dt_updated                DateTime                    @default(now()) @updatedAt
+  ds_name                   String?
+  ds_email                  String                      @unique
+  is_confirmed              Boolean                     @default(false)
+  is_admin                  Boolean                     @default(false)
+  js_access                 sis_access[]
+  js_empresas               sis_empresas[]
+  js_empresas_bloqueadas    sis_empresas[]              @relation("bloqueados_profiles_empresas")
+  sis_profiles_notificacoes sis_profiles_notificacoes[]
+  fis_integracao_documentos fis_integracao_documentos[]
+  sis_profiles_modules      sis_profiles_modules[]
+
+  fis_sat_conferencia           fis_sat_conferencia[]
+  fis_documento_historico       fis_documento_historico[]
+  fis_cte_alteracao_aprovador   fis_cte_subcontratacao_alter[] @relation("Aprovador")
+  fis_cte_alteracao_solicitante fis_cte_subcontratacao_alter[] @relation("Solicitante")
+  tms_fechamentos_aprovador     tms_fechamentos[]              @relation("FechamentoAprovador")
+}
+
+enum TiposNotificacoes {
+  WARN
+  INFO
+  SUCCESS
+  ERROR
+  DEBUG
+
+  @@map("tipos_notifacoes")
+}
+
+model sis_profiles_notificacoes {
+  id           String            @id @default(uuid())
+  id_profile   String
+  js_profile   sis_profiles      @relation(fields: [id_profile], references: [id], onDelete: Cascade)
+  ds_titulo    String
+  ds_descricao String?
+  cd_tipo      TiposNotificacoes
+  dt_created   DateTime          @default(now())
+  dt_updated   DateTime          @default(now()) @updatedAt
+}
+
+model sis_access {
+  id             String        @id @default(uuid())
+  dt_created     DateTime      @default(now())
+  dt_updated     DateTime      @default(now()) @updatedAt
+  id_profiles    String?       @unique
+  id_empresas    String?       @unique
+  dt_faturamento DateTime?
+  js_modules     ModuleType[]
+  js_profiles    sis_profiles? @relation(fields: [id_profiles], references: [id], onDelete: Cascade)
+  sis_empresas   sis_empresas? @relation(fields: [id_empresas], references: [id], onDelete: Cascade)
+}
+
+model sis_empresas {
+  id                         String                       @id @default(uuid())
+  id_externo                 String?
+  dt_created                 DateTime                     @default(now())
+  dt_updated                 DateTime                     @default(now()) @updatedAt
+  ds_razao_social            String?
+  ds_fantasia                String?
+  ds_apelido                 String?
+  ds_nome                    String?
+  ds_municipio               String?
+  ds_documento               String                       @unique
+  is_ativo                   Boolean?
+  dt_ativacao                DateTime?
+  dt_inativacao              DateTime?
+  ds_url                     String?
+  ds_integration_key         String?
+  ds_cnae                    String?
+  ds_inscricao_estadual      String?
+  ds_inscricao_municipal     String?
+  ds_uf                      String?
+  is_escritorio              Boolean                      @default(false)
+  id_segmento                String?
+  js_segmento                fis_segmentos_empresas?      @relation(fields: [id_segmento], references: [id])
+  id_regime_tributario       String?
+  js_regime_tributario       sis_regimes_tributarios?     @relation(fields: [id_regime_tributario], references: [id])
+  js_profiles                sis_profiles[]
+  js_access                  sis_access[]
+  id_escritorio              String?
+  js_escritorio              sis_empresas?                @relation("Escritorio", fields: [id_escritorio], references: [id])
+  js_empresas                sis_empresas[]               @relation("Escritorio")
+  js_bloqueados              sis_profiles[]               @relation("bloqueados_profiles_empresas")
+  rh_empresas                rh_empresas[]
+  fis_empresas               fis_empresas?
+  emb_empresas               emb_empresas?
+  js_certificados            sis_certificados[]
+  con_empresas               con_empresas[]
+  sis_integracao_config      sis_integracao_config[]
+  adm_empresas               adm_empresas[]
+  sis_empresas_modules       sis_empresas_modules[]
+  js_tms_empresas            tms_empresas?
+  sis_colunas_personalizadas sis_colunas_personalizadas[]
+  tms_import_layouts         tms_import_layout[]
+}
+
+model sis_regimes_tributarios {
+  id                            String                          @id @default(uuid())
+  dt_created                    DateTime                        @default(now())
+  dt_updated                    DateTime                        @default(now()) @updatedAt
+  ds_descricao                  String
+  ds_crt                        CrtType?
+  emb_empresas                  emb_empresas?                   @relation(fields: [emb_empresasId], references: [id])
+  emb_empresasId                String?
+  // emb_transportadoras_historico emb_transportadoras_historico[]
+  emb_transportadoras_historico emb_transportadoras_historico[]
+  fis_regras_entrada_nfe        fis_regras_entrada_nfe[]        @relation(name: "RegimeTributarioDest")
+
+  fis_regras_entrada_nfe_emit fis_regras_entrada_nfe[] @relation(name: "RegimeTributarioEmit")
+
+  sis_empresas sis_empresas[]
+}
+
+model sis_grupos_tributarios {
+  id      String @id @default(uuid())
+  ds_nome String @db.VarChar(50)
+
+  emb_segmento_carga emb_segmento_carga[]
+
+  sis_grupos_tributarios_vigencia sis_grupos_tributarios_vigencia[]
+}
+
+model sis_grupos_tributarios_vigencia {
+  id                          String                 @id @default(uuid())
+  id_sis_grupos_tributarios   String
+  js_sis_grupos_tributarios   sis_grupos_tributarios @relation(fields: [id_sis_grupos_tributarios], references: [id])
+  dt_vigencia                 DateTime
+  id_sis_ibge_uf_origem_carga Int
+  js_sis_ibge_uf_origem_carga sis_ibge_uf            @relation(fields: [id_sis_ibge_uf_origem_carga], references: [id])
+  vl_cst                      Int
+  fl_dif_icms                 Boolean                @default(false)
+
+  @@unique([id_sis_grupos_tributarios, dt_vigencia])
+}
+
+model sis_simples_nacional {
+  id                         String                       @id @default(uuid())
+  cd_simples                 Int                          @unique
+  ds_nome                    String                       @db.VarChar(50)
+  sis_simples_nacional_faixa sis_simples_nacional_faixa[]
+}
+
+model sis_simples_nacional_faixa {
+  id                                              String                                            @id @default(uuid())
+  ds_faixa                                        String                                            @db.VarChar(50)
+  id_sis_simples_nacional                         String
+  js_sis_simples_nacional                         sis_simples_nacional                              @relation(fields: [id_sis_simples_nacional], references: [id])
+  sis_simples_nacional_vigencia                   sis_simples_nacional_vigencia[]
+  sis_simples_nacional_divisao_taxas_prm_vigencia sis_simples_nacional_divisao_taxas_prm_vigencia[]
+}
+
+model sis_simples_nacional_vigencia {
+  id                String   @id @default(uuid())
+  dt_vigencia       DateTime
+  vl_receita_minima Decimal? @db.Decimal(14, 2)
+  vl_receita_maxima Decimal? @db.Decimal(14, 2)
+  vl_aliquota       Decimal  @db.Decimal(7, 4)
+  vl_dedutivel      Decimal  @db.Decimal(14, 2)
+  dt_created        DateTime @default(now())
+  dt_updated        DateTime @default(now()) @updatedAt
+
+  id_sis_simples_nacional_faixa    String
+  js_id_sis_simples_nacional_faixa sis_simples_nacional_faixa @relation(fields: [id_sis_simples_nacional_faixa], references: [id])
+
+  @@unique([id_sis_simples_nacional_faixa, dt_vigencia])
+}
+
+model sis_simples_nacional_divisao_taxas_prm_vigencia {
+  id                String   @id @default(uuid())
+  dt_vigencia       DateTime
+  vl_porcent_cpp    Decimal  @db.Decimal(14, 2)
+  vl_porcent_csll   Decimal  @db.Decimal(14, 2)
+  vl_porcent_irpj   Decimal  @db.Decimal(14, 2)
+  vl_porcent_pis    Decimal  @db.Decimal(14, 2)
+  vl_porcent_cofins Decimal  @db.Decimal(14, 2)
+  vl_porcent_icms   Decimal  @db.Decimal(14, 2)
+
+  dt_created DateTime @default(now())
+  dt_updated DateTime @default(now()) @updatedAt
+
+  id_sis_simples_nacional_faixa String
+  js_sis_simples_nacional_faixa sis_simples_nacional_faixa @relation(fields: [id_sis_simples_nacional_faixa], references: [id])
+
+  @@unique([id_sis_simples_nacional_faixa, dt_vigencia])
+}
+
+model sis_tipos_produto {
+  id                                   String                                 @id @default(uuid())
+  dt_created                           DateTime                               @default(now())
+  dt_updated                           DateTime                               @default(now()) @updatedAt
+  ds_descricao                         String
+  ds_codigo                            String?
+  fis_prd_segmento                     fis_prd_segmento[]
+  fis_regras_entrada_nfe_tipos_produto fis_regras_entrada_nfe_tipos_produto[]
+}
+
+model sis_tipos_servicos {
+  id               String             @id @default(uuid())
+  dt_created       DateTime           @default(now())
+  dt_updated       DateTime           @default(now()) @updatedAt
+  ds_descricao     String
+  ds_codigo        String?
+  fis_prd_segmento fis_prd_segmento[]
+
+  fis_produtos fis_produtos[]
+}
+
+model sis_origem_cst {
+  id           String   @id @default(uuid())
+  dt_created   DateTime @default(now())
+  dt_updated   DateTime @default(now()) @updatedAt
+  ds_descricao String
+  ds_codigo    String?
+
+  fis_regras_entrada_nfe_origem_trib fis_regras_entrada_nfe_origem_trib[]
+}
+
+model sis_cst {
+  id           String   @id @default(uuid())
+  dt_created   DateTime @default(now())
+  dt_updated   DateTime @default(now()) @updatedAt
+  ds_descricao String
+  ds_codigo    String?
+
+  fis_regras_entrada_nfe_cst_origem fis_regras_entrada_nfe_cst_origem[]
+
+  fis_regras_entrada_nfe fis_regras_entrada_nfe[] @relation("CstEntrada")
+
+  fis_regras_entrada_nfe_gerado fis_regras_entrada_nfe[] @relation("CstGerado")
+
+  fis_nfe_itens_alter fis_nfe_itens_alter_entrada[] @relation("CstGerado")
+}
+
+model sis_cfop {
+  id             String   @id @default(uuid())
+  dt_created     DateTime @default(now())
+  dt_updated     DateTime @default(now()) @updatedAt
+  ds_descricao   String
+  ds_codigo      String?
+  fl_fit_entrada Boolean  @default(false)
+  fl_fit_saida   Boolean  @default(false)
+  fl_fit_cte     Boolean  @default(false)
+  fl_fit_nfe     Boolean  @default(false)
+
+  fis_regras_entrada_nfe_cfop_origem fis_regras_entrada_nfe_cfop_origem[]
+
+  fis_regras_entrada_nfe fis_regras_entrada_nfe[] @relation("CfopEntrada")
+
+  fis_regras_entrada_nfe_gerado fis_regras_entrada_nfe[] @relation("CfopGerado")
+
+  fis_nfe_itens_alter fis_nfe_itens_alter_entrada[] @relation("CfopAlterado")
+}
+
+model sis_emb_marcas_carrocerias {
+  id       Int    @id @default(autoincrement())
+  cd_marca Int    @unique
+  ds_nome  String
+}
+
+model sis_certificados {
+  id              String        @id @default(uuid())
+  dt_created      DateTime      @default(now())
+  dt_updated      DateTime      @default(now()) @updatedAt
+  ds_nome         String
+  ds_nome_arquivo String
+  ds_arquivo      String
+  ds_senha        String
+  dt_expiracao    DateTime
+  id_usuario      String
+  ds_pfx          String
+  id_empresa      String?
+  sis_empresas    sis_empresas? @relation(fields: [id_empresa], references: [id], onDelete: Cascade)
+}
+
+model sis_tipo_integracao {
+  id             String           @id @default(uuid())
+  dt_created     DateTime         @default(now())
+  dt_updated     DateTime         @updatedAt
+  ds_nome        String
+  sis_integracao sis_integracao[]
+}
+
+model sis_integracao {
+  id                    String                  @id @default(uuid())
+  dt_created            DateTime                @default(now())
+  dt_updated            DateTime                @updatedAt
+  ds_nome               String
+  ds_descricao          String?
+  fl_is_para_escritorio Boolean?                @default(false)
+  fl_is_para_sistema    Boolean?                @default(false)
+  id_tipo_integracao    String
+  js_tipo_integracao    sis_tipo_integracao     @relation(fields: [id_tipo_integracao], references: [id])
+  sis_integracao_campos sis_integracao_campos[]
+  sis_integracao_config sis_integracao_config[]
+
+  adm_consumo_integracao adm_consumo_integracao[]
+}
+
+model sis_integracao_campos {
+  id                   String         @id @default(uuid())
+  dt_created           DateTime       @default(now())
+  dt_updated           DateTime       @updatedAt
+  ds_campo_nome        String
+  ds_campo_placeholder String?
+  ds_campo_tipo        String
+  ds_campo_ordem       Int
+  id_integracao        String
+  js_integracao        sis_integracao @relation(fields: [id_integracao], references: [id], onDelete: Cascade)
+}
+
+model sis_integracao_config {
+  id                String         @id @default(uuid())
+  dt_created        DateTime       @default(now())
+  dt_updated        DateTime       @updatedAt
+  ds_valores_config Json
+  id_integracao     String
+  js_integracao     sis_integracao @relation(fields: [id_integracao], references: [id], onDelete: Cascade)
+  id_sis_empresas   String
+  js_empresas       sis_empresas   @relation(fields: [id_sis_empresas], references: [id])
+
+  @@unique([id_sis_empresas, id_integracao], name: "ux_empresa_integracao")
+}
+
+model sis_municipio_ambiente_nacional {
+  id             String   @id @default(uuid())
+  dt_created     DateTime @default(now())
+  dt_updated     DateTime @updatedAt
+  ds_nome        String
+  ds_uf          String
+  ds_ibge_codigo String   @unique
+  is_ativo       Boolean  @default(true)
+}
+
+enum ModuleType {
+  SISTEMA
+  ADMINISTRATIVO
+  CONTABILIDADE
+  FISCAL
+  FINANÇAS
+  FATURAMENTO
+  ESTOQUES
+  RECURSOS_HUMANOS
+  CONTROLADORIA
+  ADM_SISTEMA
+  ADM_ESCRITORIO
+  ADM_EMPRESA
+  EMBARCADOR
+  TMS
+  REFORMA_TRIBUTARIA
+}
+
+model sis_modules {
+  id                   String                 @id @default(uuid())
+  ds_module            String
+  dt_created           DateTime               @default(now())
+  sis_profiles_modules sis_profiles_modules[]
+  sis_empresas_modules sis_empresas_modules[]
+}
+
+model sis_profiles_modules {
+  profile      sis_profiles @relation(fields: [id_profile], references: [id])
+  id_profile   String
+  module       sis_modules  @relation(fields: [id_module], references: [id])
+  id_module    String
+  dt_ativacao  DateTime     @default(now())
+  is_activated Boolean      @default(false)
+  dt_created   DateTime     @default(now())
+  dt_updated   DateTime
+
+  @@id([id_profile, id_module])
+}
+
+model sis_empresas_modules {
+  empresa      sis_empresas @relation(fields: [id_empresa], references: [id])
+  id_empresa   String
+  module       sis_modules  @relation(fields: [id_module], references: [id])
+  id_module    String
+  dt_ativacao  DateTime     @default(now())
+  is_activated Boolean      @default(false)
+  dt_created   DateTime     @default(now())
+  dt_updated   DateTime
+
+  @@id([id_empresa, id_module])
+}
+
+enum CrtType {
+  SIMPLES
+  NORMAL
+  MEI
+}
+
+model sis_regions {
+  id              Int               @id
+  dt_created      DateTime          @default(now())
+  dt_updated      DateTime          @default(now()) @updatedAt
+  ds_region       String            @db.VarChar(255)
+  ds_region_clean String?           @db.VarChar(255)
+  js_mesoregions  sis_mesoregions[]
+}
+
+model sis_mesoregions {
+  id                          Int                           @id
+  dt_created                  DateTime                      @default(now())
+  dt_updated                  DateTime                      @default(now()) @updatedAt
+  ds_mesoregion               String                        @db.VarChar(255)
+  ds_mesoregion_clean         String?                       @db.VarChar(255)
+  id_region                   Int
+  js_region                   sis_regions                   @relation(fields: [id_region], references: [id])
+  js_microregions             sis_microregions[]
+  emb_combustivel_mesorregiao emb_combustivel_mesorregiao[]
+}
+
+model sis_microregions {
+  id                          Int                           @id
+  dt_created                  DateTime                      @default(now())
+  dt_updated                  DateTime                      @default(now()) @updatedAt
+  ds_microregion              String                        @db.VarChar(255)
+  ds_microregion_clean        String?                       @db.VarChar(255)
+  id_mesoregion               Int
+  js_mesoregion               sis_mesoregions               @relation(fields: [id_mesoregion], references: [id])
+  js_ufs                      sis_ibge_uf[]
+  emb_combustivel_microregiao emb_combustivel_microregiao[]
+}
+
+model sis_ibge_uf {
+  id                     Int                      @id
+  dt_created             DateTime                 @default(now())
+  dt_updated             DateTime                 @default(now()) @updatedAt
+  ds_state               String                   @db.VarChar(255)
+  ds_state_clean         String?                  @db.VarChar(255)
+  ds_uf                  String
+  js_ibge_city           sis_igbe_city[]
+  emb_ibge_uf            emb_ibge_uf[]
+  id_microregion         Int?
+  js_microregion         sis_microregions?        @relation(fields: [id_microregion], references: [id])
+  emb_combustivel_estado emb_combustivel_estado[]
+
+  sis_grupos_tributarios_vigencia sis_grupos_tributarios_vigencia[]
+  sis_ibge_uf_vigencia            sis_ibge_uf_vigencia[]
+}
+
+model sis_igbe_city {
+  id                        Int                         @id
+  dt_created                DateTime                    @default(now())
+  dt_updated                DateTime                    @default(now()) @updatedAt
+  ds_city                   String
+  ds_city_clean             String?                     @db.VarChar(255)
+  js_uf                     sis_ibge_uf                 @relation(fields: [id_ibge_uf], references: [id])
+  id_ibge_uf                Int
+  emb_ibge_cidades          emb_ibge_cidades[]
+  emb_postos_coleta         emb_postos_coleta[]
+  emb_combustivel_municipio emb_combustivel_municipio[]
+  tms_cargas_origem         tms_cargas[]                @relation("OrigemCarga")
+  tms_cargas_destino        tms_cargas[]                @relation("DestinoCarga")
+  tms_entregas_destino      tms_entregas[]              @relation("DestinoEntrega")
+  tmsMotoristas             tms_motoristas[]
+  fis_clientes_cidade       fis_clientes[]              @relation("FisClientesCidade")
+  tms_embarcadores_cidade   tms_embarcadores[]          @relation("TmsEmbarcadoresCidade")
+}
+
+model sis_ibge_uf_vigencia {
+  id                           String      @id @default(uuid())
+  dt_created                   DateTime    @default(now())
+  dt_updated                   DateTime    @default(now()) @updatedAt
+  dt_vigencia                  DateTime
+  vl_percentual_ipva_carros    Decimal     @db.Decimal(10, 6)
+  vl_percentual_ipva_caminhoes Decimal     @db.Decimal(10, 6)
+  vl_icms_proprio              Decimal     @default(1) @db.Decimal(10, 6)
+  excecoes_uf_interestadual    Json?
+  icms_interestadual           Decimal?    @db.Decimal(10, 2)
+  vl_icms_excecao              Decimal?    @db.Decimal(10, 2)
+  credito_icms_combustivel     Boolean     @default(false)
+  credito_icms_imobilizado     Boolean     @default(false)
+  credito_icms_manutencao      Boolean     @default(false)
+  credito_icms_pneu            Boolean     @default(false)
+  id_sis_ibge_uf               Int
+  js_sis_ibge_uf               sis_ibge_uf @relation(fields: [id_sis_ibge_uf], references: [id])
+
+  @@unique([id_sis_ibge_uf, dt_vigencia])
+}
+
+model sis_armadores {
+  id            String   @id @default(uuid())
+  ds_nome       String
+  dt_created_at DateTime @default(now())
+  dt_updated_at DateTime @updatedAt
+
+  tms_cargas_container tms_cargas_container[]
+}
+
+model sis_email_enterprise {
+  id            String @id @default(uuid())
+  id_enterprise String
+  id_email      String
+}

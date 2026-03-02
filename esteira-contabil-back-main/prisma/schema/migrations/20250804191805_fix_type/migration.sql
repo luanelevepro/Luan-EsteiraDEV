@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "fis_cte" ALTER COLUMN "vl_total" SET DATA TYPE TEXT,
+ALTER COLUMN "vl_rec" SET DATA TYPE TEXT,
+ALTER COLUMN "vl_total_trib" SET DATA TYPE TEXT,
+ALTER COLUMN "vl_base_calculo_icms" SET DATA TYPE TEXT,
+ALTER COLUMN "vl_icms" SET DATA TYPE TEXT,
+ALTER COLUMN "vl_porcentagem_icms" SET DATA TYPE TEXT;

@@ -1,0 +1,36 @@
+model emb_empresas {
+  id                                    String                                   @id @default(uuid())
+  dt_created                            DateTime                                 @default(now())
+  dt_updated                            DateTime                                 @updatedAt
+  id_sis_empresas                       String                                   @unique
+  sis_empresas                          sis_empresas                             @relation(fields: [id_sis_empresas], references: [id])
+  emb_classificacao_veiculos            emb_classificacao_veiculos[]
+  emb_classificacao_carrocerias         emb_classificacao_carrocerias[]
+  emb_classificacao_implementos         emb_classificacao_implementos[]
+  emb_regimes_tributarios               sis_regimes_tributarios[]
+  emb_estabelecimentos                  emb_estabelecimentos[]
+  emb_transportadoras                   emb_transportadoras[]
+  emb_tipos_veiculos                    emb_tipos_veiculo[]
+  emb_tipo_carroceria                   emb_tipos_carroceria[]
+  emb_caracteristica_carroceria         emb_caracteristicas_carroceria[]
+  emb_marca_carroceria                  emb_marcas_carroceria[]
+  emb_tipo_porte                        emb_tipos_porte_carroceria_semireboque[]
+  emb_frota                             emb_frota[]
+  emb_implementos_historico             emb_implementos_historico[]
+  emb_tipos_insumo                      emb_tipos_insumo[]
+  emb_insumos                           emb_insumos[]
+  emb_fornecedores_insumos              emb_fornecedores_insumos[]
+  emb_orcamentos_carroceria_semireboque emb_orcamentos_carroceria_semireboque[]
+  emb_frota_reposicao                   emb_frota_reposicao[]
+  emb_implementos                       emb_implementos[]
+  // emb_carga_verificador_extra emb_carga_verificador_extra[]
+  emb_unidade_medida_minima             emb_unidade_medida_minima[]
+  emb_area_segmento                     emb_area_segmento[]
+  emb_segmento_carga                    emb_segmento_carga[]
+  emb_tipo_carga                        emb_tipo_carga[]
+  emb_carga                             emb_carga[]
+
+  emb_carga_verificador_extra emb_carga_verificador_extra[]
+  emb_custo_fixo_vigencia     emb_custo_fixo_vigencia[]
+  emb_custo_variavel_vigencia emb_custo_variavel_vigencia[]
+}

@@ -1,0 +1,235 @@
+model rh_empresas {
+  id                         String                       @id @default(uuid())
+  created_at                 DateTime                     @default(now())
+  updated_at                 DateTime                     @default(now()) @updatedAt
+  id_sis_empresas            String                       @unique
+  sis_empresas               sis_empresas                 @relation(fields: [id_sis_empresas], references: [id])
+  rh_funcionarios            rh_funcionarios[]
+  rh_departamento            rh_departamento[]
+  rh_centro_custos           rh_centro_custos[]
+  rh_cargos                  rh_cargos[]
+  rh_senioridade             rh_senioridade[]
+  rh_niveis                  rh_niveis[]
+  rh_cargo_nivel_senioridade rh_cargo_nivel_senioridade[]
+  rh_cargo_nivel_competencia rh_cargo_nivel_competencia[]
+}
+
+model rh_funcionarios {
+  id                         String                      @id @default(uuid())
+  created_at                 DateTime                    @default(now())
+  dt_updated                 DateTime                    @default(now()) @updatedAt
+  id_externo                 String?
+  id_empresa_externo         String?
+  ds_nome_empresa_externo    String?
+  ds_nome                    String
+  ds_documento               String?
+  ds_tipo_vinculo            String?
+  dt_admissao                DateTime?
+  cd_situacao                String?
+  ds_situacao                String?
+  ds_categoria               String?
+  ds_salario                 Decimal?                    @db.Decimal(10, 2)
+  ds_sexo                    String?
+  ds_horas_dia               Decimal?                    @db.Decimal(10, 2)
+  ds_horas_semana            Decimal?                    @db.Decimal(10, 2)
+  ds_horas_mes               Decimal?                    @db.Decimal(10, 2)
+  ds_data_nascimento         String?
+  ds_jornada_descricao       String?
+  ds_venc_ferias             String?
+  id_cargo                   String?
+  rh_cargos                  rh_cargos?                  @relation(fields: [id_cargo], references: [id])
+  id_cargo_nivel_senioridade String?
+  rh_cargo_nivel_senioridade rh_cargo_nivel_senioridade? @relation(fields: [id_cargo_nivel_senioridade], references: [id])
+  id_rh_empresas             String?
+  rh_empresas                rh_empresas?                @relation(fields: [id_rh_empresas], references: [id])
+  id_centro_custos           String?
+  rh_centro_custos           rh_centro_custos?           @relation(fields: [id_centro_custos], references: [id])
+  id_departamento            String?
+  rh_departamento            rh_departamento?            @relation(fields: [id_departamento], references: [id])
+  rh_avaliacao_funcionario   rh_avaliacao_funcionario[]
+  tms_motoristas             tms_motoristas[]
+}
+
+model rh_cargos {
+  id                         String                       @id @default(uuid())
+  created_at                 DateTime                     @default(now())
+  dt_updated                 DateTime                     @default(now()) @updatedAt
+  ds_nome                    String?
+  is_ativo                   Boolean?                     @default(true)
+  is_gerencia_supervisao     Boolean?
+  dt_inativacao              DateTime?
+  rh_cargo_nivel_senioridade rh_cargo_nivel_senioridade[]
+  id_empresa_externo         String?
+  ds_nome_empresa            String?
+  id_externo                 String?
+  id_rh_empresas             String?
+  rh_empresas                rh_empresas?                 @relation(fields: [id_rh_empresas], references: [id])
+  rh_funcionarios            rh_funcionarios[]
+  rh_senioridade_cargo       rh_senioridade_cargo[]
+  rh_nivel_cargo             rh_nivel_cargo[]
+}
+
+model rh_niveis {
+  id                         String                       @id @default(uuid())
+  created_at                 DateTime                     @default(now())
+  dt_updated                 DateTime                     @default(now()) @updatedAt
+  ds_nome                    String?
+  is_ativo                   Boolean?                     @default(true)
+  dt_inativacao              DateTime?
+  rh_cargo_nivel_senioridade rh_cargo_nivel_senioridade[]
+  id_rh_empresas             String?
+  rh_empresas                rh_empresas?                 @relation(fields: [id_rh_empresas], references: [id])
+  rh_nivel_cargo             rh_nivel_cargo[]
+}
+
+model rh_senioridade {
+  id                         String                       @id @default(uuid())
+  created_at                 DateTime                     @default(now())
+  dt_updated                 DateTime                     @default(now()) @updatedAt
+  ds_nome                    String?
+  is_ativo                   Boolean?                     @default(true)
+  dt_inativacao              DateTime?
+  id_rh_empresas             String?
+  rh_empresas                rh_empresas?                 @relation(fields: [id_rh_empresas], references: [id])
+  rh_cargo_nivel_senioridade rh_cargo_nivel_senioridade[]
+  rh_senioridade_cargo       rh_senioridade_cargo[]
+}
+
+model rh_senioridade_cargo {
+  id             String          @id @default(uuid())
+  created_at     DateTime        @default(now())
+  dt_updated     DateTime        @default(now()) @updatedAt
+  cd_ordem       Int?
+  id_cargo       String?
+  rh_cargos      rh_cargos?      @relation(fields: [id_cargo], references: [id])
+  id_senioridade String?
+  rh_senioridade rh_senioridade? @relation(fields: [id_senioridade], references: [id])
+}
+
+model rh_nivel_cargo {
+  id         String     @id @default(uuid())
+  created_at DateTime   @default(now())
+  dt_updated DateTime   @default(now()) @updatedAt
+  cd_ordem   Int?
+  id_cargo   String?
+  rh_cargos  rh_cargos? @relation(fields: [id_cargo], references: [id])
+  id_nivel   String?
+  rh_niveis  rh_niveis? @relation(fields: [id_nivel], references: [id])
+}
+
+model rh_cargo_nivel_senioridade {
+  id                                  String                                @id @default(uuid())
+  created_at                          DateTime                              @default(now())
+  dt_updated                          DateTime                              @default(now()) @updatedAt
+  ds_salario_min                      Decimal?                              @db.Decimal(10, 2)
+  ds_salario_max                      Decimal?                              @db.Decimal(10, 2)
+  id_cargo                            String?
+  id_senioridade                      String?
+  id_nivel                            String?
+  id_rh_empresas                      String?
+  cd_ordem_senioridade                Int?
+  rh_cargo                            rh_cargos?                            @relation(fields: [id_cargo], references: [id])
+  rh_senioridade                      rh_senioridade?                       @relation(fields: [id_senioridade], references: [id])
+  rh_nivel                            rh_niveis?                            @relation(fields: [id_nivel], references: [id])
+  rh_empresas                         rh_empresas?                          @relation(fields: [id_rh_empresas], references: [id])
+  rh_funcionarios                     rh_funcionarios[]
+  rh_cargo_nivel_competencia          rh_cargo_nivel_competencia[]
+  rh_cargo_nivel_senioridade_vigencia rh_cargo_nivel_senioridade_vigencia[]
+}
+
+model rh_cargo_nivel_senioridade_vigencia {
+  id                         String                      @id @default(uuid())
+  created_at                 DateTime                    @default(now())
+  dt_updated                 DateTime                    @default(now()) @updatedAt
+  dt_fim                     DateTime?
+  ds_salario_min             Decimal?                    @db.Decimal(10, 2)
+  ds_salario_max             Decimal?                    @db.Decimal(10, 2)
+  id_cargo_nivel_senioridade String?
+  rh_cargo_nivel_senioridade rh_cargo_nivel_senioridade? @relation(fields: [id_cargo_nivel_senioridade], references: [id])
+}
+
+model rh_competencias {
+  id                         String                       @id @default(uuid())
+  created_at                 DateTime                     @default(now())
+  dt_updated                 DateTime                     @default(now()) @updatedAt
+  ds_nome                    String?
+  is_ativo                   Boolean?                     @default(true)
+  dt_inativacao              DateTime?
+  ds_descricao               String?
+  rh_cargo_nivel_competencia rh_cargo_nivel_competencia[]
+}
+
+model rh_cargo_nivel_competencia {
+  id                         String   @id @default(uuid())
+  created_at                 DateTime @default(now())
+  dt_updated                 DateTime @default(now()) @updatedAt
+  is_ativo                   Boolean?
+  id_cargo_nivel_senioridade String?
+  id_competencia             String?
+  id_rh_empresas             String?
+
+  rh_cargo_nivel           rh_cargo_nivel_senioridade? @relation(fields: [id_cargo_nivel_senioridade], references: [id])
+  rh_competencia           rh_competencias?            @relation(fields: [id_competencia], references: [id])
+  rh_empresas              rh_empresas?                @relation(fields: [id_rh_empresas], references: [id])
+  rh_avaliacao_competencia rh_avaliacao_competencia[]
+}
+
+model rh_avaliacao_funcionario {
+  id                       String                     @id @default(uuid())
+  created_at               DateTime                   @default(now())
+  dt_updated               DateTime                   @default(now()) @updatedAt
+  id_funcionario           String?
+  rh_funcionario           rh_funcionarios?           @relation(fields: [id_funcionario], references: [id])
+  rh_avaliacao_competencia rh_avaliacao_competencia[]
+}
+
+model rh_avaliacao_competencia {
+  id                         String                      @id @default(uuid())
+  created_at                 DateTime                    @default(now())
+  dt_updated                 DateTime                    @default(now()) @updatedAt
+  id_avaliacao               String?
+  ds_nota                    Decimal?                    @db.Decimal(10, 2)
+  rh_avaliacao_funcionario   rh_avaliacao_funcionario?   @relation(fields: [id_avaliacao], references: [id])
+  id_cargo_nivel_competencia String?
+  rh_cargo_nivel_competencia rh_cargo_nivel_competencia? @relation(fields: [id_cargo_nivel_competencia], references: [id])
+}
+
+model rh_departamento {
+  id                 String            @id @default(uuid())
+  created_at         DateTime          @default(now())
+  dt_updated         DateTime          @default(now()) @updatedAt
+  ds_nome            String?
+  ds_endereco        String?
+  id_empresa_externo String?
+  ds_numero          Int?
+  id_externo         String?
+  ds_nome_empresa    String?
+  ds_bairro          String?
+  ds_cidade          String?
+  ds_estado          String?
+  cd_cep             String?
+  id_rh_empresas     String?
+  rh_empresas        rh_empresas?      @relation(fields: [id_rh_empresas], references: [id])
+  rh_funcionarios    rh_funcionarios[]
+}
+
+model rh_centro_custos {
+  id                         String            @id @default(uuid())
+  created_at                 DateTime          @default(now())
+  dt_updated                 DateTime          @default(now()) @updatedAt
+  ds_nome                    String?
+  id_empresa_externo         String?
+  id_externo                 String?
+  ds_tipo                    TipoCentroCustos?
+  ds_nome_empresa            String?
+  cd_centro_custos_sintetico Int?
+  ds_mascara                 String?
+  id_rh_empresas             String?
+  rh_empresas                rh_empresas?      @relation(fields: [id_rh_empresas], references: [id])
+  rh_funcionarios            rh_funcionarios[]
+}
+
+enum TipoCentroCustos {
+  SINTÉTICO
+  ANALÍTICO
+}

@@ -1,0 +1,97 @@
+model emb_ibge_uf {
+  id                  Int                   @id @default(autoincrement())
+  id_sis_ibge_uf      Int                   @unique
+  js_sis_ibge_uf      sis_ibge_uf           @relation(fields: [id_sis_ibge_uf], references: [id])
+  emb_ibge_cidades    emb_ibge_cidades[]
+  emb_transportadoras emb_transportadoras[]
+
+  emb_frota         emb_frota[]
+  emb_carga_destino emb_carga[] @relation("UfDestino")
+  emb_carga_origem  emb_carga[] @relation("UfOrigem")
+}
+
+model emb_ibge_cidades {
+  id                   Int                    @id @default(autoincrement())
+  id_sis_cidade        Int                    @unique
+  js_sis_city          sis_igbe_city          @relation(fields: [id_sis_cidade], references: [id])
+  id_emb_uf            Int
+  js_emb_ibge_uf       emb_ibge_uf            @relation(fields: [id_emb_uf], references: [id])
+  emb_estabelecimentos emb_estabelecimentos[]
+  emb_transportadoras  emb_transportadoras[]
+
+  emb_frota emb_frota[]
+
+  emb_carga_origem  emb_carga[] @relation("CidadeOrigem")
+  emb_carga_destino emb_carga[] @relation("CidadeDestino")
+}
+
+model emb_estabelecimentos {
+  id                 String           @id @default(uuid())
+  cd_estabelecimento String?
+  ds_nome            String
+  ds_descricao       String?
+  id_emb_ibge_cidade Int
+  js_emb_ibge_cidade emb_ibge_cidades @relation(fields: [id_emb_ibge_cidade], references: [id])
+  emb_empresas       emb_empresas     @relation(fields: [id_emb_empresas], references: [id])
+  id_emb_empresas    String
+  dt_created         DateTime         @default(now())
+  dt_updated         DateTime         @updatedAt
+
+  js_emb_carga_estabelecimento         emb_carga[] @relation("EstabelecimentoFat")
+  js_emb_carga_estabelecimento_destino emb_carga[] @relation("EstabelecimentoDestino")
+
+  emb_frota emb_frota[]
+
+  emb_frota_vigencia emb_frota_vigencia[]
+
+  emb_parametros_apuracao_carga emb_parametros_apuracao_carga[]
+
+  emb_custo_variavel_vigencia emb_custo_variavel_vigencia[]
+
+  emb_custo_fixo_vigencia emb_custo_fixo_vigencia[]
+
+  // apuracao_cargas_dados apuracao_cargas_dados[]
+}
+
+model emb_transportadoras {
+  cd_transportadora  String               @id @unique
+  ds_cnpj            String               @unique
+  ds_nome_fantasia   String
+  ds_razao_social    String
+  id_emb_empresas    String
+  emb_empresas       emb_empresas         @relation(fields: [id_emb_empresas], references: [id])
+  id_emb_ibge_uf     Int
+  js_emb_ibge_uf     emb_ibge_uf          @relation(fields: [id_emb_ibge_uf], references: [id])
+  id_emb_ibge_cidade Int
+  js_emb_ibge_cidade emb_ibge_cidades     @relation(fields: [id_emb_ibge_cidade], references: [id])
+  dt_created         DateTime             @default(now())
+  dt_updated         DateTime             @updatedAt
+  emb_carga          emb_carga[]
+  emb_frota          emb_frota[]
+  emb_frota_vigencia emb_frota_vigencia[]
+  // apuracao_cargas_dados apuracao_cargas_dados[]
+
+  @@index([cd_transportadora])
+}
+
+model emb_transportadoras_historico {
+  cd_transportadora         String                   @id @db.VarChar(10)
+  dt_vigencia               DateTime
+  id_regime_tributario      String?
+  //js_regime_tributario sis_regimes_tributarios? @relation(fields: [id_regime_tributario], references: [id])
+  dt_created                DateTime                 @default(now())
+  dt_updated                DateTime                 @updatedAt
+  sis_regimes_tributarios   sis_regimes_tributarios? @relation(fields: [sis_regimes_tributariosId], references: [id])
+  sis_regimes_tributariosId String?
+
+  @@unique([cd_transportadora, dt_vigencia])
+}
+
+model emb_taxa_juros_ano_modelo {
+  id            String  @id @default(uuid())
+  vl_ano_modelo Int     @unique
+  vl_taxa_juros Decimal @db.Decimal(6, 2)
+
+  dt_created_at DateTime @default(now())
+  dt_updated_at DateTime @updatedAt
+}

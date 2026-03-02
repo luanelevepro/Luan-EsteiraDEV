@@ -1,0 +1,68 @@
+model emb_custo_fixo_vigencia {
+  id String @id @default(uuid())
+
+  dt_vigencia              DateTime
+  vl_seguro                Decimal  @db.Decimal(10, 2)
+  vl_rastreador            Decimal  @db.Decimal(10, 2)
+  vl_administrativo        Decimal  @db.Decimal(10, 2)
+  vl_salario_motorista     Decimal  @db.Decimal(10, 2)
+  vl_encargos_motorista    Decimal  @db.Decimal(10, 2)
+  vl_parcelas              Int
+  vl_percentual_financiado Decimal  @db.Decimal(5, 2)
+  vl_residual_semireboque  Decimal  @db.Decimal(10, 2)
+  vl_residual_tracionador  Decimal  @db.Decimal(10, 2)
+  vl_encargos_ajudante     Decimal  @db.Decimal(10, 2)
+  vl_salario_ajudante      Decimal  @db.Decimal(10, 2)
+  ds_idade_veicular        String
+  vl_quantidade_ajudantes  Int
+  vl_quantidade_motoristas Int
+
+  id_emb_tipo_veiculo String
+  js_emb_tipo_veiculo emb_tipos_veiculo @relation(fields: [id_emb_tipo_veiculo], references: [id])
+
+  id_emb_estabelecimento String
+  js_emb_estabelecimento emb_estabelecimentos @relation(fields: [id_emb_estabelecimento], references: [id])
+
+  id_emb_segmento_carga String
+  js_emb_segmento_carga emb_segmento_carga @relation(fields: [id_emb_segmento_carga], references: [id])
+
+  id_emb_caracteristica_carroceria String
+  js_emb_caracteristica_carroceria emb_caracteristicas_carroceria @relation(fields: [id_emb_caracteristica_carroceria], references: [id])
+
+  id_emb_empresas String
+  js_emb_empresas emb_empresas @relation(fields: [id_emb_empresas], references: [id])
+
+  createdAt                              DateTime                              @default(now())
+  updatedAt                              DateTime                              @default(now()) @updatedAt
+  emb_carga_auxiliar_verificador_extra   emb_carga_auxiliar_verificador_extra? @relation(fields: [emb_carga_auxiliar_verificador_extraId], references: [id])
+  emb_carga_auxiliar_verificador_extraId String?
+}
+
+model emb_custo_variavel_vigencia {
+  id                                     String                                @id @default(uuid())
+  vl_quantidade_lavagem                  Int
+  vl_preco_lavagem                       Decimal                               @db.Decimal(10, 2)
+  vl_diaria_motorista                    Decimal                               @db.Decimal(10, 2)
+  vl_quantidade_recapagem_pneu           Int
+  vl_preco_recapagem_pneu                Decimal                               @db.Decimal(10, 2)
+  vl_km_total_pneu                       Decimal                               @db.Decimal(10, 2)
+  dt_vigencia                            DateTime
+  id_emb_estabelecimento                 String
+  js_emb_estabelecimento                 emb_estabelecimentos                  @relation(fields: [id_emb_estabelecimento], references: [id])
+  id_emb_segmento_carga                  String
+  js_emb_segmento_carga                  emb_segmento_carga                    @relation(fields: [id_emb_segmento_carga], references: [id])
+  id_emb_tipo_veiculo                    String
+  js_emb_tipo_veiculo                    emb_tipos_veiculo                     @relation(fields: [id_emb_tipo_veiculo], references: [id])
+  id_emb_caracteristica_carroceria       String
+  js_emb_caracteristica_carroceria       emb_caracteristicas_carroceria        @relation(fields: [id_emb_caracteristica_carroceria], references: [id])
+  id_emb_empresas                        String
+  js_emb_empresas                        emb_empresas                          @relation(fields: [id_emb_empresas], references: [id])
+  // custo variável:
+  //
+  // [id, id2, id3, id4]
+  js_custo_variavel                      Json?
+  createdAt                              DateTime                              @default(now())
+  updatedAt                              DateTime                              @default(now()) @updatedAt
+  emb_carga_auxiliar_verificador_extraId String?
+  emb_carga_auxiliar_verificador_extra   emb_carga_auxiliar_verificador_extra? @relation(fields: [emb_carga_auxiliar_verificador_extraId], references: [id])
+}

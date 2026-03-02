@@ -1,0 +1,184 @@
+model emb_carga {
+  id                            String    @id @default(uuid())
+  cd_carga                      String
+  dt_saida                      DateTime
+  dt_entrega                    DateTime?
+  id_emb_estabelecimento        String? // was cd_estabelecimento_id
+  ds_estabelecimento            String?
+  id_emb_tipo_carga             String? // was id_tipo_carga
+  ds_tipo_carga                 String?
+  id_emb_frota                  String // was cd_frota_id
+  cd_placa_trac                 String?
+  ds_transportador_nome         String?
+  id_ori_uf                     Int?
+  id_ori_cidade                 Int?
+  id_dest_uf                    Int
+  id_dest_cidade                Int
+  vl_distancia_carga            Decimal   @db.Decimal(20, 2)
+  vl_dist_km_chao               Decimal?  @db.Decimal(20, 2)
+  vl_frete                      Decimal   @db.Decimal(20, 2)
+  vl_frete_mun                  Decimal?  @db.Decimal(20, 2)
+  vl_frete_est                  Decimal?  @db.Decimal(20, 2)
+  vl_pedagio                    Decimal?  @db.Decimal(20, 2)
+  id_status_carga               Int? // was cd_status_carga
+  fl_processado                 Int?      @default(0)
+  dt_competencia                DateTime?
+  vl_litros_combustivel         Decimal?  @db.Decimal(8, 2)
+  id_origem_combustivel         Int? // was cd_origem_combustivel
+  id_emb_origem_combustivel     Int? // was id_origem_combustivel
+  vl_litro_combustivel          Decimal?  @db.Decimal(8, 2)
+  vl_km_litro                   Decimal?  @db.Decimal(8, 2)
+  vl_dias_competencia_atual     Int?
+  vl_dias_competencia_posterior Int?
+  dt_corte_inicial              DateTime?
+  dt_corte_final                DateTime?
+  vl_icms                       Decimal?  @db.Decimal(20, 2)
+  vl_dsp_extras                 Decimal?  @db.Decimal(20, 2)
+  dt_created_at                 DateTime  @default(now())
+  dt_updated_at                 DateTime  @updatedAt
+
+  // Relações
+  js_emb_tipo_carga              emb_tipo_carga?       @relation(fields: [id_emb_tipo_carga], references: [id])
+  id_emb_transportadora          String // was cd_transportadora
+  js_emb_transportador           emb_transportadoras?  @relation(fields: [id_emb_transportadora], references: [cd_transportadora])
+  id_emb_estabelecimento_fat     String // was id_estabelecimento_fat
+  js_emb_estabelecimento_fat     emb_estabelecimentos? @relation("EstabelecimentoFat", fields: [id_emb_estabelecimento_fat], references: [id])
+  id_emb_estabelecimento_destino String // was id_estabelecimento_destino
+  js_emb_estabelecimento_destino emb_estabelecimentos? @relation("EstabelecimentoDestino", fields: [id_emb_estabelecimento_destino], references: [id])
+  id_emb_empresa                 String
+  js_emb_empresa                 emb_empresas          @relation(fields: [id_emb_empresa], references: [id])
+  js_emb_cidade_destino          emb_ibge_cidades?     @relation("CidadeDestino", fields: [id_dest_cidade], references: [id])
+  js_emb_cidade_origem           emb_ibge_cidades?     @relation("CidadeOrigem", fields: [id_ori_cidade], references: [id])
+  js_emb_uf_destino              emb_ibge_uf?          @relation("UfDestino", fields: [id_dest_uf], references: [id])
+  js_emb_uf_origem               emb_ibge_uf?          @relation("UfOrigem", fields: [id_ori_uf], references: [id])
+
+  @@unique([cd_carga, id_emb_empresa])
+}
+
+model emb_tipo_carga {
+  id                 String   @id @default(uuid())
+  cd_tipo_carga      String
+  ds_tipo_carga      String
+  id_segmento        String?
+  fl_coleta          Boolean  @default(false)
+  ds_un_medida_carga String?
+  dt_created_at      DateTime @default(now())
+  dt_updated_at      DateTime @updatedAt
+
+  id_emb_empresa String
+  js_emb_empresa emb_empresas @relation(fields: [id_emb_empresa], references: [id])
+
+  // Relações
+  segmento emb_segmento_carga? @relation(fields: [id_segmento], references: [id])
+  cargas   emb_carga[]
+}
+
+model emb_segmento_carga {
+  id                   String   @id @default(uuid())
+  cd_segmento_carga    String
+  ds_segmento_carga    String
+  id_area_segmento     String?
+  id_verificador_extra Int?
+  ds_unidade           String?
+  ds_faturamento       String?
+  dt_created_at        DateTime @default(now())
+  dt_updated_at        DateTime @updatedAt
+
+  // Relações
+  js_emb_area_segmento    emb_area_segmento?      @relation(fields: [id_area_segmento], references: [id])
+  // js_emb_verificador_extra emb_verificadores_extras_carga? @relation(fields: [id_verificador_extra], references: [id])
+  id_grupo_tributario     String
+  js_sis_grupo_tributario sis_grupos_tributarios? @relation(fields: [id_grupo_tributario], references: [id])
+  js_emb_tipos_carga      emb_tipo_carga[]
+  id_emb_empresa          String
+  js_emb_empresa          emb_empresas            @relation(fields: [id_emb_empresa], references: [id])
+
+  emb_frota_reposicao emb_frota_reposicao[]
+
+  emb_parametros_apuracao_carga emb_parametros_apuracao_carga[]
+
+  emb_custo_variavel_vigencia emb_custo_variavel_vigencia[]
+  emb_custo_fixo_vigencia     emb_custo_fixo_vigencia[]
+}
+
+model emb_area_segmento {
+  id            String   @id @default(uuid())
+  cd_area       Int
+  ds_area       String
+  dt_created_at DateTime @default(now())
+  dt_updated_at DateTime @updatedAt
+
+  id_emb_empresa String
+  js_emb_empresa emb_empresas @relation(fields: [id_emb_empresa], references: [id])
+
+  // Relações
+  segmentos emb_segmento_carga[]
+
+  @@unique([cd_area, id_emb_empresa])
+}
+
+model emb_carga_verificador_extra {
+  id                                  String   @id @default(uuid())
+  cd_codigo_verificador               Int
+  ds_descricao_verificador            String   @db.VarChar(255)
+  id_auxiliar_verificador_extra_carga String?
+  dt_createdat                        DateTime @default(now())
+  dt_updatedAt                        DateTime @updatedAt
+
+  auxiliar_verificador_extra_carga emb_carga_auxiliar_verificador_extra? @relation(fields: [id_auxiliar_verificador_extra_carga], references: [id])
+  id_emb_empresas                  String
+  js_emb_empresas                  emb_empresas                          @relation(fields: [id_emb_empresas], references: [id])
+
+  @@unique([cd_codigo_verificador, id_emb_empresas])
+}
+
+model emb_carga_auxiliar_verificador_extra {
+  id                                             String   @id @default(uuid()) // Chave primária autoincremental única do registro auxiliar.
+  ds_nome_tabela                                 String   @db.VarChar(100) // ds_ : Nome lógico ou amigável da tabela que atuará como fonte de dados para o verificador.
+  ds_nome_tabela_banco_dados                     String   @db.VarChar(100) // ds_ : Nome físico (real) da tabela no esquema do banco de dados.
+  ds_nome_campo                                  String?  @db.VarChar(100) // ds_ : Nome lógico ou amigável do campo dentro da tabela fonte.
+  ds_nome_campo_banco_dados                      String?  @db.VarChar(100) // ds_ : Nome físico (real) do campo na tabela do banco de dados.
+  ds_nome_campo_carga_relacao_tabela_banco_dados String?  @db.VarChar(100) // ds_ : Nome do campo na tabela 'carga' que estabelece a relação com os dados desta tabela/campo fonte.
+  ds_nome_tabela_origem_dados                    String?  @db.VarChar(100) // ds_ : Nome da tabela de onde os valores de opção são efetivamente buscados (pode ser diferente da tabela principal para cenários mais complexos).
+  ds_nome_campo_origem_descricao                 String?  @db.VarChar(100) // ds_ : Nome do campo na tabela de origem que contém o texto descritivo a ser exibido ao usuário (ex: em dropdowns).
+  fl_multiplos_relacionamentos                   Boolean? // fl_ : Flag booleana que indica se a relação com este verificador pode envolver múltiplos valores (true) ou apenas um valor (false/null).
+  dt_data_criacao                                DateTime @default(now()) // dt_ : Data e hora exatas da criação do registro auxiliar.
+  dt_data_atualizacao                            DateTime @updatedAt // dt_ : Data e hora exatas da última modificação do registro auxiliar.
+
+  verificadores_extras_carga emb_carga_verificador_extra[] // Relacionamento inverso, lista todos os verificadores que utilizam esta configuração auxiliar.
+
+  js_emb_custo_variavel_vigencia emb_custo_variavel_vigencia[]
+  emb_custo_fixo_vigencia        emb_custo_fixo_vigencia[]
+}
+
+model emb_unidade_medida_minima {
+  id        String @id @default(uuid())
+  cd_codigo String
+  ds_medida String
+
+  id_emb_empresa                String
+  js_emb_empresa                emb_empresas                    @relation(fields: [id_emb_empresa], references: [id])
+  emb_parametros_apuracao_carga emb_parametros_apuracao_carga[]
+
+  @@unique([cd_codigo, id_emb_empresa])
+}
+
+model emb_parametros_apuracao_carga {
+  id                       String                    @id @default(uuid())
+  id_emb_segmento_carga    String
+  emb_segmento_carga       emb_segmento_carga        @relation(fields: [id_emb_segmento_carga], references: [id])
+  id_emb_estabelecimento   String
+  js_emb_estabelecimento   emb_estabelecimentos      @relation(fields: [id_emb_estabelecimento], references: [id])
+  dt_vigencia              DateTime                  @default(now())
+  id_emb_tipos_veiculo     String
+  js_emb_tipos_veiculo     emb_tipos_veiculo         @relation(fields: [id_emb_tipos_veiculo], references: [id])
+  // verf_extra = models.CharField(max_length=255,null=True)
+  vl_minimo                Int
+  id_unidade_medida_minima String
+  js_unidade_medida_minima emb_unidade_medida_minima @relation(fields: [id_unidade_medida_minima], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([id_emb_segmento_carga, id_emb_estabelecimento, id_emb_tipos_veiculo, id_unidade_medida_minima])
+}
